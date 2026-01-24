@@ -16,10 +16,63 @@ const saveMasterData = (data) => {
     fs.writeFileSync(MASTER_DATA_PATH, JSON.stringify(data, null, 2));
 };
 
-// List all bank masters
+const BALANCES_DATA_PATH = path.join(__dirname, '../data/bank_balances_daily.json');
+
+// Helper to read daily balances
+const getDailyBalances = () => {
+    if (!fs.existsSync(BALANCES_DATA_PATH)) return {};
+    return JSON.parse(fs.readFileSync(BALANCES_DATA_PATH, 'utf8'));
+};
+
+// Helper to save daily balances
+const saveDailyBalances = (data) => {
+    fs.writeFileSync(BALANCES_DATA_PATH, JSON.stringify(data, null, 2));
+};
+
+// List all bank masters and balances
 router.get('/', (req, res) => {
     const banks = getMasterData();
-    res.render('bank-balances', { banks });
+    const dailyBalances = getDailyBalances();
+    const positionDate = req.query.positionDate || new Date().toISOString().split('T')[0];
+    
+    // Enrich banks with balance for the selected date
+    const enrichedBanks = banks.map(bank => ({
+        ...bank,
+        balance: dailyBalances[positionDate]?.[bank.id] || 0
+    }));
+
+    res.render('bank-balances', { banks: enrichedBanks, positionDate });
+});
+
+// Save single bank balance
+router.post('/save-balance', (req, res) => {
+    const { bankId, balance, positionDate } = req.body;
+    const dailyBalances = getDailyBalances();
+
+    if (!dailyBalances[positionDate]) {
+        dailyBalances[positionDate] = {};
+    }
+
+    dailyBalances[positionDate][bankId] = parseFloat(balance) || 0;
+    saveDailyBalances(dailyBalances);
+    res.redirect(`/bank-balances?positionDate=${positionDate}`);
+});
+
+// Save all bank balances
+router.post('/save-all-balances', (req, res) => {
+    const { balances, positionDate } = req.body; // balances is an object { bankId: amount }
+    const dailyBalances = getDailyBalances();
+
+    if (!dailyBalances[positionDate]) {
+        dailyBalances[positionDate] = {};
+    }
+
+    Object.keys(balances).forEach(bankId => {
+        dailyBalances[positionDate][bankId] = parseFloat(balances[bankId]) || 0;
+    });
+
+    saveDailyBalances(dailyBalances);
+    res.redirect(`/bank-balances?positionDate=${positionDate}`);
 });
 
 // Create new bank master
