@@ -61,13 +61,28 @@ app.get('/api/dashboard', (req, res) => {
 
         const start = new Date(fromDate);
         const end = new Date(toDate);
-        const dayDiff = Math.max(1, Math.round((end - start) / (1000 * 60 * 60 * 24)) + 1);
-        const adjustedCollection = (dashboardMetrics.collection || 0) * dayDiff;
+        
+        // Fetch Live Collection Data
+        const COLLECTIONS_DATA_PATH = path.join(__dirname, 'src/data/daily_collections.json');
+        let totalCollection = 0;
+        try {
+            if (fs.existsSync(COLLECTIONS_DATA_PATH)) {
+                const collections = JSON.parse(fs.readFileSync(COLLECTIONS_DATA_PATH, 'utf8'));
+                for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+                    const dateStr = d.toISOString().split('T')[0];
+                    if (collections[dateStr]) {
+                        totalCollection += collections[dateStr].netCollection || 0;
+                    }
+                }
+            }
+        } catch (err) {
+            console.error('Dashboard API Collection Error:', err);
+        }
 
         res.json({
             bankBalance: totalBalance,
             bankBreakdown: breakdown,
-            collection: adjustedCollection,
+            collection: totalCollection,
             hsdOutstanding: dashboardMetrics.hsdOutstanding,
             fromDate,
             toDate

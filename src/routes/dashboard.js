@@ -55,17 +55,31 @@ router.get('/', (req, res) => {
         return { name: bankName, balance: balance };
     });
     
-    // Simulate collection calculation based on date range
-    const start = new Date(fromDate);
-    const end = new Date(toDate);
-    const dayDiff = Math.max(1, Math.round((end - start) / (1000 * 60 * 60 * 24)) + 1);
-    
-    const adjustedCollection = dashboardMetrics.collection * (dayDiff > 0 ? dayDiff : 1);
+    // Calculate collection for date range
+    const collectionsDataPath = path.join(__dirname, '../data/daily_collections.json');
+    let totalCollection = 0;
+    try {
+        if (fs.existsSync(collectionsDataPath)) {
+            const collections = JSON.parse(fs.readFileSync(collectionsDataPath, 'utf8'));
+            const start = new Date(fromDate);
+            const end = new Date(toDate);
+            
+            // Loop through dates in range and sum Net Collection
+            for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+                const dateStr = d.toISOString().split('T')[0];
+                if (collections[dateStr]) {
+                    totalCollection += collections[dateStr].netCollection || 0;
+                }
+            }
+        }
+    } catch (err) {
+        console.error('Error reading collections for dashboard:', err);
+    }
 
     const data = {
         bankBalance: totalLiveBankBalance,
         bankBreakdown: liveBankBreakdown,
-        collection: adjustedCollection,
+        collection: totalCollection,
         hsdOutstanding: dashboardMetrics.hsdOutstanding,
         fromDate,
         toDate

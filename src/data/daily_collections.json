@@ -1,1 +1,11 @@
-{}
+{
+  "2026-01-24": {
+    "fromDate": "2026-01-23",
+    "toDate": "2026-01-23",
+    "grossCollection": 300,
+    "batta": 33,
+    "posCharges": 75,
+    "netCollection": 192,
+    "updatedAt": "2026-01-24T15:25:50.689Z"
+  }
+}
