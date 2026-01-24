@@ -11,17 +11,33 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// View Engine (EJS for beginner-friendliness)
+// View Engine
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
-// Sample Data Import
-const sampleFinanceData = require('./src/data/sample_finance.json');
+// Sample Data
+const dashboardMetrics = require('./src/data/dashboard_metrics.json');
+
+// Helper to get yesterday's date string
+const getYesterdayDate = () => {
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    return yesterday.toISOString().split('T')[0];
+};
+
+// API Endpoint
+app.get('/api/dashboard', (req, res) => {
+    const date = req.query.date || getYesterdayDate();
+    res.json({
+        ...dashboardMetrics,
+        date: date
+    });
+});
 
 // Routes
 const dashboardRoutes = require('./src/routes/dashboard');
 app.use('/', dashboardRoutes);
 
 app.listen(PORT, '0.0.0.0', () => {
-  console.log(`TNSTC Finance Planner running at http://0.0.0.0:${PORT}`);
+    console.log(`TNSTC Finance Planner running at http://0.0.0.0:${PORT}`);
 });
