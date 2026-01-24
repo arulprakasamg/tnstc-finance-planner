@@ -26,16 +26,24 @@ const getTodayDate = () => {
     return new Date().toISOString().split('T')[0];
 };
 
+// Helper to get yesterday's date string
+const getYesterdayDate = () => {
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    return yesterday.toISOString().split('T')[0];
+};
+
 // Render Daily Collections Page
 router.get('/', (req, res) => {
     const collections = getCollections();
     const today = getTodayDate();
+    const yesterday = getYesterdayDate();
     
     // Default search/entry date to today
     const positionDate = req.query.positionDate || today;
     const entry = collections[positionDate] || {
-        fromDate: today,
-        toDate: today,
+        fromDate: yesterday,
+        toDate: yesterday,
         grossCollection: 0,
         batta: 0,
         posCharges: 0,
