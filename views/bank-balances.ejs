@@ -73,7 +73,7 @@
                 </div>
             </div>
 
-            <form id="allBalancesForm" action="/bank-balances/save-all-balances" method="POST">
+            <form id="allBalancesForm" onsubmit="saveAllBalances(event)">
                 <input type="hidden" name="positionDate" value="<%= positionDate %>">
                 <div class="master-table-container">
                     <table class="master-table">
@@ -231,14 +231,71 @@
             window.location.href = `/bank-balances?positionDate=${date}`;
         }
 
-        function saveSingleBalance(bankId, btn) {
+        async function saveSingleBalance(bankId, btn) {
             const row = btn.closest('tr');
             const input = row.querySelector('.balance-input');
             const balance = input.value;
+            const positionDate = "<%= positionDate %>";
 
-            document.getElementById('singleBankId').value = bankId;
-            document.getElementById('singleBalance').value = balance;
-            document.getElementById('singleBalanceForm').submit();
+            try {
+                const response = await fetch('/bank-balances/save-balance', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ bankId, balance, positionDate })
+                });
+
+                if (response.redirected) {
+                    window.location.href = response.url;
+                } else if (response.ok) {
+                    window.location.reload();
+                } else {
+                    const error = await response.text();
+                    alert('Error saving balance: ' + error);
+                }
+            } catch (err) {
+                console.error('Save failed:', err);
+                alert('Network error while saving balance');
+            }
+        }
+
+        async function saveAllBalances(event) {
+            event.preventDefault();
+            const form = event.target;
+            const formData = new FormData(form);
+            const positionDate = formData.get('positionDate');
+            const balances = {};
+
+            // Extract balances[id] from FormData
+            for (let [key, value] of formData.entries()) {
+                if (key.startsWith('balances[')) {
+                    const bankId = key.match(/\[(.*?)\]/)[1];
+                    balances[bankId] = value;
+                }
+            }
+
+            try {
+                const response = await fetch('/bank-balances/save-all-balances', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ balances, positionDate })
+                });
+
+                if (response.redirected) {
+                    window.location.href = response.url;
+                } else if (response.ok) {
+                    window.location.reload();
+                } else {
+                    const error = await response.text();
+                    alert('Error saving all balances: ' + error);
+                }
+            } catch (err) {
+                console.error('Save all failed:', err);
+                alert('Network error while saving all balances');
+            }
         }
 
         const modal = document.getElementById('bankModal');

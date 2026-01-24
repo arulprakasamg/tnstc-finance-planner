@@ -88,6 +88,11 @@ router.post('/save-balance', (req, res) => {
 
     dailyBalances[positionDate][bankId] = parseFloat(balance) || 0;
     saveDailyBalances(dailyBalances);
+    
+    // For AJAX/JSON requests, send a 200 OK or a JSON response
+    if (req.xhr || req.headers.accept.indexOf('json') > -1 || req.headers['content-type'] === 'application/json') {
+        return res.json({ success: true, redirect: `/bank-balances?positionDate=${positionDate}` });
+    }
     res.redirect(`/bank-balances?positionDate=${positionDate}`);
 });
 
@@ -113,6 +118,11 @@ router.post('/save-all-balances', (req, res) => {
     });
 
     saveDailyBalances(dailyBalances);
+
+    // For AJAX/JSON requests
+    if (req.xhr || req.headers.accept.indexOf('json') > -1 || req.headers['content-type'] === 'application/json') {
+        return res.json({ success: true, redirect: `/bank-balances?positionDate=${positionDate}` });
+    }
     res.redirect(`/bank-balances?positionDate=${positionDate}`);
 });
 
