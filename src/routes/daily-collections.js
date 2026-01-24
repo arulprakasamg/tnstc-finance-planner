@@ -21,28 +21,21 @@ const saveCollections = (data) => {
     fs.writeFileSync(COLLECTIONS_DATA_PATH, JSON.stringify(data, null, 2));
 };
 
-// Helper to get default dates
-const getDefaultDates = () => {
-    const today = new Date();
-    const yesterday = new Date();
-    yesterday.setDate(yesterday.getDate() - 1);
-    
-    return {
-        today: today.toISOString().split('T')[0],
-        yesterday: yesterday.toISOString().split('T')[0]
-    };
+// Helper to get today's date string
+const getTodayDate = () => {
+    return new Date().toISOString().split('T')[0];
 };
 
 // Render Daily Collections Page
 router.get('/', (req, res) => {
     const collections = getCollections();
-    const { today, yesterday } = getDefaultDates();
+    const today = getTodayDate();
     
     // Default search/entry date to today
     const positionDate = req.query.positionDate || today;
     const entry = collections[positionDate] || {
-        fromDate: yesterday,
-        toDate: yesterday,
+        fromDate: today,
+        toDate: today,
         grossCollection: 0,
         batta: 0,
         posCharges: 0,

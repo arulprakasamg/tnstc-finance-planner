@@ -101,8 +101,15 @@
 
     <script>
         function calculateNet() {
-            const gross = parseFloat(document.getElementById('grossCollection').value) || 0;
-            const pos = parseFloat(document.getElementById('posCharges').value) || 0;
+            const grossInput = document.getElementById('grossCollection');
+            const posInput = document.getElementById('posCharges');
+            
+            // Prevent negative values on input
+            if (parseFloat(grossInput.value) < 0) grossInput.value = 0;
+            if (parseFloat(posInput.value) < 0) posInput.value = 0;
+
+            const gross = parseFloat(grossInput.value) || 0;
+            const pos = parseFloat(posInput.value) || 0;
             
             const batta = (gross * 0.11);
             const net = gross - batta - pos;
@@ -116,6 +123,12 @@
             const formData = new FormData(e.target);
             const data = Object.fromEntries(formData.entries());
             
+            // Validation
+            if (parseFloat(data.grossCollection) < 0 || parseFloat(data.posCharges) < 0) {
+                alert('Values cannot be negative');
+                return;
+            }
+
             try {
                 const response = await fetch('/daily-collections/save', {
                     method: 'POST',
