@@ -170,10 +170,18 @@ button {
 }
 
 .amount {
-    margin: 1rem 0;
+    margin: 1rem 0 0.2rem 0;
     font-size: 2rem;
     font-weight: 800;
     letter-spacing: -1px;
+}
+
+.card-date-info {
+    font-size: 0.85rem;
+    font-weight: 600;
+    opacity: 0.9;
+    margin-bottom: 1rem;
+    color: #ffd700;
 }
 
 /* Bank Breakdown Styling */
