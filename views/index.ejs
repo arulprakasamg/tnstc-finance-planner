@@ -9,7 +9,29 @@
 <body>
     <header>
         <h1>TNSTC Finance Planner</h1>
-        <p class="date-range">Reporting Date: <%= data.fromDate %></p>
+        <div class="date-controls">
+            <form action="/" method="GET" id="dateForm">
+                <div class="input-group">
+                    <label for="fromDate">From:</label>
+                    <input type="date" id="fromDate" name="fromDate" value="<%= data.fromDate %>">
+                </div>
+                <div class="input-group">
+                    <label for="toDate">To:</label>
+                    <input type="date" id="toDate" name="toDate" value="<%= data.toDate %>">
+                </div>
+                <button type="submit">Update</button>
+            </form>
+        </div>
+        <% 
+            const formatDate = (dateStr) => {
+                const date = new Date(dateStr);
+                return date.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+            };
+            const fromStr = formatDate(data.fromDate);
+            const toStr = formatDate(data.toDate);
+            const displayDate = fromStr === toStr ? `Collection Date: ${fromStr}` : `Collection Date: ${fromStr} – ${toStr}`;
+        %>
+        <p class="date-range"><%= displayDate %></p>
     </header>
     
     <main class="container">
