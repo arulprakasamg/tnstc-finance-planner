@@ -27,24 +27,57 @@ const getYesterdayDate = () => {
 
 // API Endpoint
 app.get('/api/dashboard', (req, res) => {
+    const fs = require('fs');
     const yesterday = getYesterdayDate();
     const fromDate = req.query.fromDate || yesterday;
     const toDate = req.query.toDate || yesterday;
 
-    // Mock range calculation
-    const start = new Date(fromDate);
-    const end = new Date(toDate);
-    const dayDiff = Math.max(1, Math.round((end - start) / (1000 * 60 * 60 * 24)) + 1);
-    const adjustedCollection = dashboardMetrics.collection * dayDiff;
+    const MASTER_DATA_PATH = path.join(__dirname, 'src/data/bank_master.json');
+    const BALANCES_DATA_PATH = path.join(__dirname, 'src/data/bank_balances_daily.json');
 
-    res.json({
-        bankBalance: dashboardMetrics.bankBalance,
-        bankBreakdown: dashboardMetrics.bankBreakdown || [],
-        collection: adjustedCollection,
-        hsdOutstanding: dashboardMetrics.hsdOutstanding,
-        fromDate,
-        toDate
-    });
+    // Required Display Order
+    const BANK_ORDER = [
+        "SBI – PLATINUM",
+        "IOB – 5555",
+        "I.B",
+        "IOB – 42300",
+        "IOB – 142300"
+    ];
+
+    try {
+        const banksMaster = JSON.parse(fs.readFileSync(MASTER_DATA_PATH, 'utf8'));
+        const dailyBalances = JSON.parse(fs.readFileSync(BALANCES_DATA_PATH, 'utf8'));
+        const availableDates = Object.keys(dailyBalances).sort();
+
+        let totalBalance = 0;
+        const breakdown = BANK_ORDER.map(name => {
+            const master = banksMaster.find(b => b.bankName === name);
+            let balance = 0;
+            if (master) {
+                const effectiveDate = availableDates.slice().reverse().find(d => d <= toDate && dailyBalances[d][master.id] !== undefined);
+                if (effectiveDate) balance = dailyBalances[effectiveDate][master.id];
+            }
+            totalBalance += balance;
+            return { name, balance };
+        });
+
+        const start = new Date(fromDate);
+        const end = new Date(toDate);
+        const dayDiff = Math.max(1, Math.round((end - start) / (1000 * 60 * 60 * 24)) + 1);
+        const adjustedCollection = (dashboardMetrics.collection || 0) * dayDiff;
+
+        res.json({
+            bankBalance: totalBalance,
+            bankBreakdown: breakdown,
+            collection: adjustedCollection,
+            hsdOutstanding: dashboardMetrics.hsdOutstanding,
+            fromDate,
+            toDate
+        });
+    } catch (err) {
+        console.error('Dashboard API Error:', err);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
 });
 
 // Routes
