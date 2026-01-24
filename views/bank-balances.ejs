@@ -8,49 +8,52 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
 </head>
 <body>
-    <header>
-        <h1>Bank Balances</h1>
-        <p class="date-range">Manage Bank Master Details</p>
-    </header>
-    
-    <main class="container">
-        <!-- Bank Master Management -->
-        <section class="master-section">
-            <div class="section-header">
-                <h2>Bank Master Details</h2>
-                <button onclick="showAddModal()" class="btn-primary">Add New Bank</button>
-            </div>
+    <%- include('partials/sidebar', { activePage: 'bank-balances' }) %>
 
-            <div class="master-table-container">
-                <table class="master-table">
-                    <thead>
-                        <tr>
-                            <th>Account Name</th>
-                            <th>Account Number</th>
-                            <th>Bank Name</th>
-                            <th>Type</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <% banks.forEach(bank => { %>
+    <div class="main-content">
+        <header>
+            <h1>Bank Balances</h1>
+            <p class="date-range">Manage Bank Master Details</p>
+        </header>
+        
+        <main class="container">
+            <section class="master-section">
+                <div class="section-header">
+                    <h2>Bank Master Details</h2>
+                    <button onclick="showAddModal()" class="btn-primary">Add New Bank</button>
+                </div>
+
+                <div class="master-table-container">
+                    <table class="master-table">
+                        <thead>
                             <tr>
-                                <td><%= bank.accountName %></td>
-                                <td><%= bank.accountNumber %></td>
-                                <td><%= bank.bankName %></td>
-                                <td><span class="badge"><%= bank.accountType %></span></td>
-                                <td>
-                                    <button onclick='showEditModal(<%- JSON.stringify(bank) %>)' class="btn-edit">Edit</button>
-                                </td>
+                                <th>Account Name</th>
+                                <th>Account Number</th>
+                                <th>Bank Name</th>
+                                <th>Type</th>
+                                <th>Actions</th>
                             </tr>
-                        <% }) %>
-                    </tbody>
-                </table>
-            </div>
-        </section>
-    </main>
+                        </thead>
+                        <tbody>
+                            <% banks.forEach(bank => { %>
+                                <tr>
+                                    <td><%= bank.accountName %></td>
+                                    <td><%= bank.accountNumber %></td>
+                                    <td><%= bank.bankName %></td>
+                                    <td><span class="badge"><%= bank.accountType %></span></td>
+                                    <td>
+                                        <button onclick='showEditModal(<%- JSON.stringify(bank) %>)' class="btn-edit">Edit</button>
+                                    </td>
+                                </tr>
+                            <% }) %>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+    </div>
 
-    <!-- Modals -->
+    <!-- Modals (Remains unchanged) -->
     <div id="bankModal" class="modal">
         <div class="modal-content">
             <h3 id="modalTitle">Add Bank Master</h3>
@@ -94,7 +97,6 @@
         .btn-secondary { background: #f0f2f5; color: #1a3c5e; border: none; padding: 0.6rem 1.5rem; border-radius: 6px; cursor: pointer; }
         .btn-edit { background: none; border: 1px solid #3498db; color: #3498db; padding: 0.3rem 1rem; border-radius: 4px; cursor: pointer; }
         
-        /* Modal Styles */
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; }
         .modal-content { background: white; width: 400px; margin: 10% auto; padding: 2rem; border-radius: 12px; }
         .form-group { margin-bottom: 1.2rem; }
