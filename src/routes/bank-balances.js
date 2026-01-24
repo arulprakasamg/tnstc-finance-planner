@@ -29,17 +29,42 @@ const saveDailyBalances = (data) => {
     fs.writeFileSync(BALANCES_DATA_PATH, JSON.stringify(data, null, 2));
 };
 
-// List all bank masters and balances
+// List all bank masters and balances with rolling logic
 router.get('/', (req, res) => {
     const banks = getMasterData();
     const dailyBalances = getDailyBalances();
     const positionDate = req.query.positionDate || new Date().toISOString().split('T')[0];
     
-    // Enrich banks with balance for the selected date
-    const enrichedBanks = banks.map(bank => ({
-        ...bank,
-        balance: dailyBalances[positionDate]?.[bank.id] || 0
-    }));
+    // Sort dates to find the most recent previous balance
+    const sortedDates = Object.keys(dailyBalances).sort().reverse();
+
+    // Enrich banks with balance for the selected date or carry forward
+    const enrichedBanks = banks.map(bank => {
+        let balance = 0;
+        let isCarriedForward = false;
+        let lastUpdated = null;
+
+        if (dailyBalances[positionDate] && dailyBalances[positionDate][bank.id] !== undefined) {
+            balance = dailyBalances[positionDate][bank.id];
+            isCarriedForward = false;
+            lastUpdated = positionDate;
+        } else {
+            // Find most recent previous balance
+            const previousDate = sortedDates.find(d => d < positionDate && dailyBalances[d][bank.id] !== undefined);
+            if (previousDate) {
+                balance = dailyBalances[previousDate][bank.id];
+                isCarriedForward = true;
+                lastUpdated = previousDate;
+            }
+        }
+
+        return {
+            ...bank,
+            balance,
+            isCarriedForward,
+            lastUpdated
+        };
+    });
 
     res.render('bank-balances', { banks: enrichedBanks, positionDate });
 });

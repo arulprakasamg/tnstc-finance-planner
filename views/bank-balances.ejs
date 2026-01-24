@@ -87,17 +87,22 @@
                         </thead>
                         <tbody>
                             <% banks.forEach(bank => { %>
-                                <tr>
+                                <tr class="<%= bank.isCarriedForward ? 'carried-forward-row' : '' %>">
                                     <td><%= bank.accountName %></td>
                                     <td><%= bank.accountNumber %></td>
                                     <td>
-                                        <input type="number" 
-                                               name="balances[<%= bank.id %>]" 
-                                               value="<%= bank.balance %>" 
-                                               step="0.01" 
-                                               min="0" 
-                                               class="balance-input"
-                                               required>
+                                        <div class="input-wrapper">
+                                            <input type="number" 
+                                                   name="balances[<%= bank.id %>]" 
+                                                   value="<%= bank.balance %>" 
+                                                   step="0.01" 
+                                                   min="0" 
+                                                   class="balance-input"
+                                                   required>
+                                            <% if (bank.isCarriedForward) { %>
+                                                <span class="carried-forward-indicator" title="Carried forward from <%= bank.lastUpdated %>">→</span>
+                                            <% } %>
+                                        </div>
                                     </td>
                                     <td>
                                         <button type="button" 
@@ -190,6 +195,25 @@
             padding: 0.4rem;
             border-radius: 4px;
             border: 1px solid #ddd;
+        }
+
+        .input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .carried-forward-indicator {
+            position: absolute;
+            right: 10px;
+            color: #f39c12;
+            font-weight: bold;
+            font-size: 1.2rem;
+            cursor: help;
+        }
+
+        .carried-forward-row td {
+            background-color: #fff9f0;
         }
 
         /* Modal Styles */
