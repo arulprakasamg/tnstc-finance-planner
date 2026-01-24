@@ -8,6 +8,15 @@ const getYesterdayDate = () => {
     return yesterday.toISOString().split('T')[0];
 };
 
+// Required Display Order for Banks
+const BANK_ORDER = [
+    "SBI – PLATINUM",
+    "IOB – 5555",
+    "I.B",
+    "IOB – 42300",
+    "IOB – 142300"
+];
+
 // Dashboard Page
 router.get('/', (req, res) => {
     const dashboardMetrics = require('../data/dashboard_metrics.json');
@@ -24,9 +33,15 @@ router.get('/', (req, res) => {
     
     const adjustedCollection = dashboardMetrics.collection * (dayDiff > 0 ? dayDiff : 1);
 
+    // Sort bank breakdown in required order
+    const sortedBreakdown = BANK_ORDER.map(bankName => {
+        const found = dashboardMetrics.bankBreakdown.find(b => b.name === bankName);
+        return found ? found : { name: bankName, balance: 0 };
+    });
+
     const data = {
         bankBalance: dashboardMetrics.bankBalance,
-        bankBreakdown: dashboardMetrics.bankBreakdown || [],
+        bankBreakdown: sortedBreakdown,
         collection: adjustedCollection,
         hsdOutstanding: dashboardMetrics.hsdOutstanding,
         fromDate,
