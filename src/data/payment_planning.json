@@ -1,1 +1,11 @@
-{}
+{
+  "2026-01-24": [
+    {
+      "category": "Oil Companies",
+      "subCategory": "IOC",
+      "amount": 500,
+      "bankId": "1",
+      "updatedAt": "2026-01-24T17:18:58.486Z"
+    }
+  ]
+}

@@ -24,6 +24,21 @@
             <p class="date-range">Capture Planned Payments</p>
         </header>
         <main class="container">
+            <div class="fund-summary-banner">
+                <div class="summary-item">
+                    <span class="label">Available Fund</span>
+                    <span class="value" id="availableFund">₹<%= availableFund.toLocaleString('en-IN', { minimumFractionDigits: 2 }) %></span>
+                </div>
+                <div class="summary-item">
+                    <span class="label">Total Planned Amount</span>
+                    <span class="value highlight-planned" id="totalPlanned">₹0.00</span>
+                </div>
+                <div class="summary-item">
+                    <span class="label">Remaining Balance</span>
+                    <span class="value" id="remainingBalance">₹<%= availableFund.toLocaleString('en-IN', { minimumFractionDigits: 2 }) %></span>
+                </div>
+            </div>
+
             <section class="planning-section">
                 <div class="section-header">
                     <h2>Planned Payment Entry</h2>
@@ -124,6 +139,37 @@
     </div>
 
     <style>
+        .fund-summary-banner {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+            background: #1a3c5e;
+            padding: 1.5rem;
+            border-radius: 12px;
+            color: white;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .summary-item {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            text-align: center;
+        }
+        .summary-item .label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            opacity: 0.8;
+            font-weight: 600;
+        }
+        .summary-item .value {
+            font-size: 1.5rem;
+            font-weight: 800;
+        }
+        .highlight-planned { color: #f39c12; }
+        .negative-balance { color: #ff6b6b !important; }
+
         .planning-section { background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
         .category-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; }
         .category-block { border: 1px solid #eee; padding: 1rem; border-radius: 8px; background: #fcfcfc; }
@@ -138,12 +184,42 @@
     </style>
 
     <script>
+        // Fund calculation logic
+        const rawAvailableFund = <%= availableFund %>;
+        
+        function updateFundSummary() {
+            let totalPlanned = 0;
+            document.querySelectorAll('input[data-sub]').forEach(input => {
+                totalPlanned += parseFloat(input.value) || 0;
+            });
+
+            const remaining = rawAvailableFund - totalPlanned;
+            
+            document.getElementById('totalPlanned').innerText = '₹' + totalPlanned.toLocaleString('en-IN', { minimumFractionDigits: 2 });
+            const remainingEl = document.getElementById('remainingBalance');
+            remainingEl.innerText = '₹' + remaining.toLocaleString('en-IN', { minimumFractionDigits: 2 });
+            
+            if (remaining < 0) {
+                remainingEl.classList.add('negative-balance');
+            } else {
+                remainingEl.classList.remove('negative-balance');
+            }
+        }
+
+        // Add event listeners to all inputs
+        document.querySelectorAll('input[data-sub]').forEach(input => {
+            input.addEventListener('input', updateFundSummary);
+        });
+
         // Load existing data into inputs
         const currentEntries = <%- JSON.stringify(entries) %>;
         currentEntries.forEach(e => {
             const input = document.querySelector(`input[data-sub="${e.subCategory}"]`);
             if (input) input.value = e.amount;
         });
+        
+        // Initial summary update
+        updateFundSummary();
 
         document.getElementById('planningForm').onsubmit = async (e) => {
             e.preventDefault();

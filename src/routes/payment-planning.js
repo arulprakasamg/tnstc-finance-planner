@@ -22,8 +22,40 @@ router.get('/', (req, res) => {
     const today = new Date().toISOString().split('T')[0];
     const positionDate = req.query.positionDate || today;
     
+    // Calculate Available Fund
+    const BALANCES_DATA_PATH = path.join(__dirname, '../data/bank_balances_daily.json');
+    const COLLECTIONS_DATA_PATH = path.join(__dirname, '../data/daily_collections.json');
+    
+    let totalBankBalance = 0;
+    let netCollection = 0;
+
+    try {
+        if (fs.existsSync(BALANCES_DATA_PATH)) {
+            const dailyBalances = JSON.parse(fs.readFileSync(BALANCES_DATA_PATH, 'utf8'));
+            const availableDates = Object.keys(dailyBalances).sort();
+            
+            banks.forEach(bank => {
+                // Rolling logic: find latest balance on or before positionDate
+                const effectiveDate = availableDates.slice().reverse().find(d => d <= positionDate && dailyBalances[d][bank.id] !== undefined);
+                if (effectiveDate) {
+                    totalBankBalance += dailyBalances[effectiveDate][bank.id] || 0;
+                }
+            });
+        }
+        
+        if (fs.existsSync(COLLECTIONS_DATA_PATH)) {
+            const collections = JSON.parse(fs.readFileSync(COLLECTIONS_DATA_PATH, 'utf8'));
+            if (collections[positionDate]) {
+                netCollection = collections[positionDate].netCollection || 0;
+            }
+        }
+    } catch (err) {
+        console.error('Error calculating funds:', err);
+    }
+
+    const availableFund = totalBankBalance + netCollection;
     const entries = planning[positionDate] || [];
-    res.render('payment-planning', { entries, positionDate, banks });
+    res.render('payment-planning', { entries, positionDate, banks, availableFund });
 });
 
 router.post('/save', (req, res) => {
