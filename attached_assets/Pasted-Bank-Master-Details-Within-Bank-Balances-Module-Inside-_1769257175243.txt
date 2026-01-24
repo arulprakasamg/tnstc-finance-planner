@@ -1,0 +1,141 @@
+Bank Master Details (Within Bank Balances Module)
+
+Inside the Bank Balances module, allow creation and maintenance of bank master details.
+
+Fields:
+
+Account Name (mandatory)
+
+Account Number (mandatory, editable)
+
+Bank Name (mandatory)
+
+Account Type (Operational / Savings / Special)
+
+Rules:
+
+Account Number must be unique
+
+Account Name and Bank Name cannot be empty
+
+Edit option must always be enabled for bank master details
+
+Deletion:
+
+Prevent deletion if:
+
+Any bank balance exists (any date)
+
+Any payment planning exists
+
+Show clear warning message when deletion is blocked.
+
+2️⃣ Position Date (Core Control)
+
+Introduce and enforce Position Date clearly.
+
+Rules:
+
+Default Position Date = Today
+
+User must be able to change Position Date manually
+
+All bank balances are tied to Position Date
+
+3️⃣ Bank Balance Entry (Rolling Balance Behaviour)
+
+Implement rolling bank balance logic:
+
+When a bank balance is entered on a date (e.g. 23-01-2026):
+
+The same balance must automatically carry forward to the next dates
+
+It should continue to display until the balance is explicitly modified
+
+Example:
+
+Balance entered on 23-01-2026
+
+On 24-01-2026 → same balance auto-displayed
+
+Officer modifies balance on 24-01-2026 → new balance applies from that date onward
+
+4️⃣ Bank Balance Modification Rules
+
+Allow bank balance modification on any Position Date.
+
+Rules:
+
+Only one effective balance per bank per Position Date
+
+Balance must not be negative
+
+Modification applies from that date forward
+
+Previous dates remain unchanged
+
+5️⃣ “Last Updated” Date & Time Display
+
+Display Last Updated Date & Time for each bank balance.
+
+Example:
+
+Last updated on: 23-01-2026 18:45
+
+Rules:
+
+Timestamp updates only when balance is modified
+
+Timestamp must remain visible even when balance is carried forward
+
+Purpose:
+
+Daily verification
+
+Audit clarity
+
+Officer confidence
+
+6️⃣ Integration With Other Modules
+
+Bank balances from this module must be the single source of truth for:
+
+Dashboard → Bank Balance card (total + bank-wise)
+
+Payment Planning → available funds validation
+
+HSD payments → fund availability checks
+
+Always use the latest applicable balance as of Position Date.
+
+7️⃣ UI / UX Constraints
+
+Menu name must remain “Bank Balances”
+
+Keep existing screen layout
+
+Show:
+
+Position Date selector
+
+Bank list with balance fields
+
+Last updated timestamp per bank
+
+Do NOT:
+
+Add new menus
+
+Change sidebar
+
+Redesign UI
+
+8️⃣ Data Safety & Audit Readiness
+
+Ensure:
+
+No hard deletion of balances
+
+Historical balances remain viewable
+
+All changes are date-bound and traceable
