@@ -3,6 +3,62 @@ body {
     background-color: #f0f2f5;
     margin: 0;
     color: #1a1a1a;
+    display: flex;
+    min-height: 100vh;
+}
+
+.sidebar {
+    width: 260px;
+    background-color: #1a3c5e;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    height: 100vh;
+    left: 0;
+    top: 0;
+    z-index: 100;
+}
+
+.sidebar-header {
+    padding: 2rem;
+    text-align: center;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+.sidebar-header h2 {
+    margin: 0;
+    font-size: 1.2rem;
+    letter-spacing: 1px;
+}
+
+.sidebar-menu {
+    list-style: none;
+    padding: 1.5rem 0;
+    margin: 0;
+    flex: 1;
+}
+
+.sidebar-menu li a {
+    display: block;
+    padding: 0.8rem 2rem;
+    color: rgba(255,255,255,0.7);
+    text-decoration: none;
+    transition: all 0.2s;
+    font-size: 0.95rem;
+}
+
+.sidebar-menu li a:hover, .sidebar-menu li a.active {
+    color: white;
+    background-color: rgba(255,255,255,0.1);
+    border-left: 4px solid #f39c12;
+}
+
+.main-content {
+    flex: 1;
+    margin-left: 260px;
+    display: flex;
+    flex-direction: column;
 }
 
 header {

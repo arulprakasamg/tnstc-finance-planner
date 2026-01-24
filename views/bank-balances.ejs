@@ -8,8 +8,22 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
 </head>
 <body>
-    <header>
-        <h1>Bank Balances</h1>
+    <nav class="sidebar">
+        <div class="sidebar-header">
+            <h2>TNSTC Finance</h2>
+        </div>
+        <ul class="sidebar-menu">
+            <li><a href="/">Dashboard</a></li>
+            <li><a href="/bank-balances" class="active">Bank Balances</a></li>
+            <li><a href="#">Daily Collections</a></li>
+            <li><a href="#">Payment Planning</a></li>
+            <li><a href="#">HSD</a></li>
+            <li><a href="#">Financial Reports</a></li>
+        </ul>
+    </nav>
+    <div class="main-content">
+        <header>
+            <h1>Bank Balances</h1>
         <p class="date-range">Manage Bank Master Details</p>
     </header>
     
@@ -103,6 +117,7 @@
         .modal-actions { display: flex; justify-content: flex-end; gap: 1rem; margin-top: 2rem; }
     </style>
 
+    </div>
     <script>
         const modal = document.getElementById('bankModal');
         const form = document.getElementById('bankForm');
