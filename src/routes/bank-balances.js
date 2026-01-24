@@ -71,7 +71,15 @@ router.get('/', (req, res) => {
 
 // Save single bank balance
 router.post('/save-balance', (req, res) => {
-    const { bankId, balance, positionDate } = req.body;
+    console.log('POST /save-balance body:', req.body);
+    const body = req.body || {};
+    const { bankId, balance, positionDate } = body;
+    
+    if (!bankId || !positionDate) {
+        console.error('Missing required fields for save-balance');
+        return res.status(400).send('Bank ID and Position Date are required');
+    }
+
     const dailyBalances = getDailyBalances();
 
     if (!dailyBalances[positionDate]) {
@@ -85,7 +93,15 @@ router.post('/save-balance', (req, res) => {
 
 // Save all bank balances
 router.post('/save-all-balances', (req, res) => {
-    const { balances, positionDate } = req.body; // balances is an object { bankId: amount }
+    console.log('POST /save-all-balances body:', req.body);
+    const body = req.body || {};
+    const { balances = {}, positionDate } = body;
+
+    if (!positionDate) {
+        console.error('Missing positionDate for save-all-balances');
+        return res.status(400).send('Position Date is required');
+    }
+
     const dailyBalances = getDailyBalances();
 
     if (!dailyBalances[positionDate]) {
