@@ -18,16 +18,15 @@ router.get('/', (req, res) => {
     const toDate = req.query.toDate || yesterday;
     
     // Simulate collection calculation based on date range
-    // In a real app, this would be a DB query sum
     const start = new Date(fromDate);
     const end = new Date(toDate);
     const dayDiff = Math.max(1, Math.round((end - start) / (1000 * 60 * 60 * 24)) + 1);
     
-    // Mock calculation: daily collection * number of days
     const adjustedCollection = dashboardMetrics.collection * (dayDiff > 0 ? dayDiff : 1);
 
     const data = {
         bankBalance: dashboardMetrics.bankBalance,
+        bankBreakdown: dashboardMetrics.bankBreakdown || [],
         collection: adjustedCollection,
         hsdOutstanding: dashboardMetrics.hsdOutstanding,
         fromDate,

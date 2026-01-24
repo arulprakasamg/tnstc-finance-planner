@@ -37,17 +37,38 @@
     
     <main class="container">
         <section class="summary-cards">
+            <!-- Bank Balance Card with Breakdown -->
             <div class="card card-balance">
-                <h3>Bank Balance</h3>
-                <p class="amount">₹<%= data.bankBalance.toLocaleString('en-IN', { minimumFractionDigits: 2 }) %></p>
+                <div class="card-main">
+                    <h3>Bank Balance</h3>
+                    <p class="amount">₹<%= data.bankBalance.toLocaleString('en-IN', { minimumFractionDigits: 2 }) %></p>
+                </div>
+                <div class="card-breakdown">
+                    <ul class="bank-list">
+                        <% data.bankBreakdown.forEach(bank => { %>
+                            <li>
+                                <span class="bank-name"><%= bank.name %></span>
+                                <span class="bank-value">₹<%= bank.balance.toLocaleString('en-IN', { minimumFractionDigits: 2 }) %></span>
+                            </li>
+                        <% }) %>
+                    </ul>
+                </div>
             </div>
+
+            <!-- Collection Card -->
             <div class="card card-collection">
-                <h3>Collection</h3>
-                <p class="amount">₹<%= data.collection.toLocaleString('en-IN', { minimumFractionDigits: 2 }) %></p>
+                <div class="card-main">
+                    <h3>Collection</h3>
+                    <p class="amount">₹<%= data.collection.toLocaleString('en-IN', { minimumFractionDigits: 2 }) %></p>
+                </div>
             </div>
+
+            <!-- HSD Outstanding Card -->
             <div class="card card-hsd">
-                <h3>HSD Outstanding</h3>
-                <p class="amount">₹<%= data.hsdOutstanding.toLocaleString('en-IN', { minimumFractionDigits: 2 }) %></p>
+                <div class="card-main">
+                    <h3>HSD Outstanding</h3>
+                    <p class="amount">₹<%= data.hsdOutstanding.toLocaleString('en-IN', { minimumFractionDigits: 2 }) %></p>
+                </div>
             </div>
         </section>
     </main>

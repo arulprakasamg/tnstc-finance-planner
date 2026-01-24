@@ -39,6 +39,7 @@ app.get('/api/dashboard', (req, res) => {
 
     res.json({
         bankBalance: dashboardMetrics.bankBalance,
+        bankBreakdown: dashboardMetrics.bankBreakdown || [],
         collection: adjustedCollection,
         hsdOutstanding: dashboardMetrics.hsdOutstanding,
         fromDate,

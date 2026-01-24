@@ -1,5 +1,12 @@
 {
   "bankBalance": 45678234.50,
   "collection": 12845600.00,
-  "hsdOutstanding": 8560000.75
+  "hsdOutstanding": 8560000.75,
+  "bankBreakdown": [
+    { "name": "I.B", "balance": 15000000.00 },
+    { "name": "IOB – 142300", "balance": 8500000.00 },
+    { "name": "IOB – 42300", "balance": 7200000.00 },
+    { "name": "IOB – 5555", "balance": 9478234.50 },
+    { "name": "SBI", "balance": 5500000.00 }
+  ]
 }
