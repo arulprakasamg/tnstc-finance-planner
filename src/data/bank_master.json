@@ -1,0 +1,23 @@
+[
+  {
+    "id": "1",
+    "accountName": "OPERATIONAL FUND - SBI",
+    "accountNumber": "1234567890",
+    "bankName": "SBI – PLATINUM",
+    "accountType": "Operational"
+  },
+  {
+    "id": "2",
+    "accountName": "COLLECTION ACCOUNT - IOB",
+    "accountNumber": "5555123456",
+    "bankName": "IOB – 5555",
+    "accountType": "Operational"
+  },
+  {
+    "id": "3",
+    "accountName": "SAVINGS ACCOUNT - IB",
+    "accountNumber": "9876543210",
+    "bankName": "I.B",
+    "accountType": "Savings"
+  }
+]
