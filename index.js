@@ -27,10 +27,13 @@ const getYesterdayDate = () => {
 
 // API Endpoint
 app.get('/api/dashboard', (req, res) => {
-    const date = req.query.date || getYesterdayDate();
+    const yesterday = getYesterdayDate();
     res.json({
-        ...dashboardMetrics,
-        date: date
+        bankBalance: dashboardMetrics.bankBalance,
+        collection: dashboardMetrics.collection,
+        hsdOutstanding: dashboardMetrics.hsdOutstanding,
+        fromDate: yesterday,
+        toDate: yesterday
     });
 });
 
