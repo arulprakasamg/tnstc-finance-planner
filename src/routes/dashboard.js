@@ -4,11 +4,9 @@ const router = express.Router();
 const fs = require('fs');
 const path = require('path');
 
-// Helper to get yesterday's date string
-const getYesterdayDate = () => {
-    const yesterday = new Date();
-    yesterday.setDate(yesterday.getDate() - 1);
-    return yesterday.toISOString().split('T')[0];
+// Helper to get today's date string
+const getTodayDate = () => {
+    return new Date().toISOString().split('T')[0];
 };
 
 // Required Display Order for Banks
@@ -26,11 +24,11 @@ const BALANCES_DATA_PATH = path.join(__dirname, '../data/bank_balances_daily.jso
 // Dashboard Page
 router.get('/', (req, res) => {
     const dashboardMetrics = require('../data/dashboard_metrics.json');
-    const yesterday = getYesterdayDate();
+    const today = getTodayDate();
     
-    // Default to yesterday if not provided
-    const fromDate = req.query.fromDate || yesterday;
-    const toDate = req.query.toDate || yesterday;
+    // Default to today if not provided
+    const fromDate = req.query.fromDate || today;
+    const toDate = req.query.toDate || today;
     
     // Read live data
     const banksMaster = JSON.parse(fs.readFileSync(MASTER_DATA_PATH, 'utf8'));

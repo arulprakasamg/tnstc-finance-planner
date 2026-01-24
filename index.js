@@ -18,19 +18,17 @@ app.set('views', path.join(__dirname, 'views'));
 // Sample Data
 const dashboardMetrics = require('./src/data/dashboard_metrics.json');
 
-// Helper to get yesterday's date string
-const getYesterdayDate = () => {
-    const yesterday = new Date();
-    yesterday.setDate(yesterday.getDate() - 1);
-    return yesterday.toISOString().split('T')[0];
+// Helper to get today's date string
+const getTodayDate = () => {
+    return new Date().toISOString().split('T')[0];
 };
 
 // API Endpoint
 app.get('/api/dashboard', (req, res) => {
     const fs = require('fs');
-    const yesterday = getYesterdayDate();
-    const fromDate = req.query.fromDate || yesterday;
-    const toDate = req.query.toDate || yesterday;
+    const today = getTodayDate();
+    const fromDate = req.query.fromDate || today;
+    const toDate = req.query.toDate || today;
 
     const MASTER_DATA_PATH = path.join(__dirname, 'src/data/bank_master.json');
     const BALANCES_DATA_PATH = path.join(__dirname, 'src/data/bank_balances_daily.json');
