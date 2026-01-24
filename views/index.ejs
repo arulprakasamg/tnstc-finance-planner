@@ -74,6 +74,13 @@
                 <div class="card-main">
                     <h3>Collection</h3>
                     <p class="amount">₹<%= data.collection.toLocaleString('en-IN', { minimumFractionDigits: 2 }) %></p>
+                    <p class="card-date-info">
+                        <% if (data.fromDate === data.toDate) { %>
+                            <%= formatDate(data.fromDate) %>
+                        <% } else { %>
+                            <%= formatDate(data.fromDate) %> – <%= formatDate(data.toDate) %>
+                        <% } %>
+                    </p>
                 </div>
             </div>
 
