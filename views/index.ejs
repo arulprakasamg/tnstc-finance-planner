@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TNSTC Finance Planner</title>
     <link rel="stylesheet" href="/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
 </head>
 <body>
     <header>
@@ -12,14 +13,14 @@
         <div class="date-controls">
             <form action="/" method="GET" id="dateForm">
                 <div class="input-group">
-                    <label for="fromDate">From:</label>
+                    <label for="fromDate">From Date</label>
                     <input type="date" id="fromDate" name="fromDate" value="<%= data.fromDate %>">
                 </div>
                 <div class="input-group">
-                    <label for="toDate">To:</label>
+                    <label for="toDate">To Date</label>
                     <input type="date" id="toDate" name="toDate" value="<%= data.toDate %>">
                 </div>
-                <button type="submit">Update</button>
+                <button type="submit">Refresh Data</button>
             </form>
         </div>
         <% 
@@ -36,17 +37,17 @@
     
     <main class="container">
         <section class="summary-cards">
-            <div class="card">
+            <div class="card card-balance">
                 <h3>Bank Balance</h3>
                 <p class="amount">₹<%= data.bankBalance.toLocaleString('en-IN', { minimumFractionDigits: 2 }) %></p>
             </div>
-            <div class="card">
+            <div class="card card-collection">
                 <h3>Collection</h3>
-                <p class="amount income">₹<%= data.collection.toLocaleString('en-IN', { minimumFractionDigits: 2 }) %></p>
+                <p class="amount">₹<%= data.collection.toLocaleString('en-IN', { minimumFractionDigits: 2 }) %></p>
             </div>
-            <div class="card">
+            <div class="card card-hsd">
                 <h3>HSD Outstanding</h3>
-                <p class="amount expense">₹<%= data.hsdOutstanding.toLocaleString('en-IN', { minimumFractionDigits: 2 }) %></p>
+                <p class="amount">₹<%= data.hsdOutstanding.toLocaleString('en-IN', { minimumFractionDigits: 2 }) %></p>
             </div>
         </section>
     </main>
