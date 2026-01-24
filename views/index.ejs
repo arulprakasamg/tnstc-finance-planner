@@ -3,76 +3,75 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - TNSTC Finance Planner</title>
+    <title>TNSTC Finance Planner</title>
     <link rel="stylesheet" href="/css/style.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
 </head>
 <body>
-    <%- include('partials/sidebar', { activePage: 'dashboard' }) %>
+    <header>
+        <h1>TNSTC Finance Planner</h1>
+        <div class="date-controls">
+            <form action="/" method="GET" id="dateForm">
+                <div class="input-group">
+                    <label for="fromDate">From Date</label>
+                    <input type="date" id="fromDate" name="fromDate" value="<%= data.fromDate %>">
+                </div>
+                <div class="input-group">
+                    <label for="toDate">To Date</label>
+                    <input type="date" id="toDate" name="toDate" value="<%= data.toDate %>">
+                </div>
+                <button type="submit">Refresh Data</button>
+            </form>
+        </div>
+        <% 
+            const formatDate = (dateStr) => {
+                const date = new Date(dateStr);
+                return date.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+            };
+            const fromStr = formatDate(data.fromDate);
+            const toStr = formatDate(data.toDate);
+            const displayDate = fromStr === toStr ? `Position Date: ${fromStr}` : `Position Date: ${fromStr} – ${toStr}`;
+        %>
+        <p class="date-range"><%= displayDate %></p>
+    </header>
     
-    <div class="main-content">
-        <header>
-            <h1>Dashboard</h1>
-            <div class="date-controls">
-                <form action="/" method="GET" id="dateForm">
-                    <div class="input-group">
-                        <label for="fromDate">From Date</label>
-                        <input type="date" id="fromDate" name="fromDate" value="<%= data.fromDate %>">
-                    </div>
-                    <div class="input-group">
-                        <label for="toDate">To Date</label>
-                        <input type="date" id="toDate" name="toDate" value="<%= data.toDate %>">
-                    </div>
-                    <button type="submit">Refresh Data</button>
-                </form>
+    <main class="container">
+        <section class="summary-cards">
+            <!-- Bank Balance Card with Breakdown -->
+            <div class="card card-balance">
+                <div class="card-main">
+                    <h3>Bank Balance</h3>
+                    <p class="amount">₹<%= data.bankBalance.toLocaleString('en-IN', { minimumFractionDigits: 2 }) %></p>
+                </div>
+                <div class="card-breakdown">
+                    <ul class="bank-list">
+                        <% data.bankBreakdown.forEach(bank => { %>
+                            <li>
+                                <span class="bank-name"><%= bank.name %></span>
+                                <span class="bank-value">₹<%= bank.balance.toLocaleString('en-IN', { minimumFractionDigits: 2 }) %></span>
+                            </li>
+                        <% }) %>
+                    </ul>
+                </div>
             </div>
-            <% 
-                const formatDate = (dateStr) => {
-                    const date = new Date(dateStr);
-                    return date.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
-                };
-                const fromStr = formatDate(data.fromDate);
-                const toStr = formatDate(data.toDate);
-                const displayDate = fromStr === toStr ? `Position Date: ${fromStr}` : `Position Date: ${fromStr} – ${toStr}`;
-            %>
-            <p class="date-range"><%= displayDate %></p>
-        </header>
-        
-        <main class="container">
-            <section class="summary-cards">
-                <div class="card card-balance">
-                    <div class="card-main">
-                        <h3>Bank Balance</h3>
-                        <p class="amount">₹<%= data.bankBalance.toLocaleString('en-IN', { minimumFractionDigits: 2 }) %></p>
-                    </div>
-                    <div class="card-breakdown">
-                        <ul class="bank-list">
-                            <% data.bankBreakdown.forEach(bank => { %>
-                                <li>
-                                    <span class="bank-name"><%= bank.name %></span>
-                                    <span class="bank-value">₹<%= bank.balance.toLocaleString('en-IN', { minimumFractionDigits: 2 }) %></span>
-                                </li>
-                            <% }) %>
-                        </ul>
-                    </div>
-                </div>
 
-                <div class="card card-collection">
-                    <div class="card-main">
-                        <h3>Collection</h3>
-                        <p class="amount">₹<%= data.collection.toLocaleString('en-IN', { minimumFractionDigits: 2 }) %></p>
-                    </div>
+            <!-- Collection Card -->
+            <div class="card card-collection">
+                <div class="card-main">
+                    <h3>Collection</h3>
+                    <p class="amount">₹<%= data.collection.toLocaleString('en-IN', { minimumFractionDigits: 2 }) %></p>
                 </div>
+            </div>
 
-                <div class="card card-hsd">
-                    <div class="card-main">
-                        <h3>HSD Outstanding</h3>
-                        <p class="amount">₹<%= data.hsdOutstanding.toLocaleString('en-IN', { minimumFractionDigits: 2 }) %></p>
-                    </div>
+            <!-- HSD Outstanding Card -->
+            <div class="card card-hsd">
+                <div class="card-main">
+                    <h3>HSD Outstanding</h3>
+                    <p class="amount">₹<%= data.hsdOutstanding.toLocaleString('en-IN', { minimumFractionDigits: 2 }) %></p>
                 </div>
-            </section>
-        </main>
-    </div>
+            </div>
+        </section>
+    </main>
 
     <script src="/js/main.js"></script>
 </body>
