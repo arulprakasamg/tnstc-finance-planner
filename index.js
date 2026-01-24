@@ -97,9 +97,11 @@ app.get('/api/dashboard', (req, res) => {
 const dashboardRoutes = require('./src/routes/dashboard');
 const bankBalancesRoutes = require('./src/routes/bank-balances');
 const dailyCollectionsRoutes = require('./src/routes/daily-collections');
+const paymentPlanningRoutes = require('./src/routes/payment-planning');
 app.use('/', dashboardRoutes);
 app.use('/bank-balances', bankBalancesRoutes);
 app.use('/daily-collections', dailyCollectionsRoutes);
+app.use('/payment-planning', paymentPlanningRoutes);
 
 app.listen(PORT, '0.0.0.0', () => {
     console.log(`TNSTC Finance Planner running at http://0.0.0.0:${PORT}`);

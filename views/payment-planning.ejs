@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Planning - TNSTC Finance Planner</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <nav class="sidebar">
+        <div class="sidebar-header"><h2>TNSTC Finance</h2></div>
+        <ul class="sidebar-menu">
+            <li><a href="/">Dashboard</a></li>
+            <li><a href="/bank-balances">Bank Balances</a></li>
+            <li><a href="/daily-collections">Daily Collections</a></li>
+            <li><a href="/payment-planning" class="active">Payment Planning</a></li>
+            <li><a href="#">HSD</a></li>
+            <li><a href="#">Financial Reports</a></li>
+        </ul>
+    </nav>
+    <div class="main-content">
+        <header>
+            <h1>Payment Planning</h1>
+            <p class="date-range">Capture Planned Payments</p>
+        </header>
+        <main class="container">
+            <section class="planning-section">
+                <div class="section-header">
+                    <h2>Planned Payment Entry</h2>
+                    <div class="controls">
+                        <label>Position Date:</label>
+                        <input type="date" id="posDate" value="<%= positionDate %>" onchange="window.location.href='/payment-planning?positionDate='+this.value">
+                    </div>
+                </div>
+
+                <form id="planningForm" class="planning-form">
+                    <input type="hidden" name="positionDate" value="<%= positionDate %>">
+                    <div class="form-group" style="margin-bottom: 2rem;">
+                        <label>Bank Account *</label>
+                        <select name="bankId" required style="width: 100%; padding: 0.8rem; border-radius: 6px;">
+                            <% banks.forEach(bank => { %>
+                                <option value="<%= bank.id %>"><%= bank.bankName %> - <%= bank.accountNumber %></option>
+                            <% }) %>
+                        </select>
+                    </div>
+
+                    <div class="category-grid">
+                        <!-- Category blocks will be here -->
+                        <div class="category-block">
+                            <h3>1. Oil Companies</h3>
+                            <div class="sub-category"><span>IOC</span><input type="number" data-cat="Oil Companies" data-sub="IOC" step="0.01" min="0"></div>
+                            <div class="sub-category"><span>BPC</span><input type="number" data-cat="Oil Companies" data-sub="BPC" step="0.01" min="0"></div>
+                            <div class="sub-category"><span>HPC</span><input type="number" data-cat="Oil Companies" data-sub="HPC" step="0.01" min="0"></div>
+                            <div class="sub-category"><span>Retail / Confed</span><input type="number" data-cat="Oil Companies" data-sub="Retail / Confed" step="0.01" min="0"></div>
+                            <div class="sub-category"><span>Ramnad</span><input type="number" data-cat="Oil Companies" data-sub="Ramnad" step="0.01" min="0"></div>
+                            <div class="sub-category"><span>CNG</span><input type="number" data-cat="Oil Companies" data-sub="CNG" step="0.01" min="0"></div>
+                        </div>
+
+                        <div class="category-block">
+                            <h3>2. Region Fund</h3>
+                            <div class="sub-category"><span>MV Tax</span><input type="number" data-cat="Region Fund" data-sub="MV Tax" step="0.01" min="0"></div>
+                            <div class="sub-category"><span>Canteen</span><input type="number" data-cat="Region Fund" data-sub="Canteen" step="0.01" min="0"></div>
+                            <div class="sub-category"><span>EB</span><input type="number" data-cat="Region Fund" data-sub="EB" step="0.01" min="0"></div>
+                            <div class="sub-category"><span>Sweeper / Labour</span><input type="number" data-cat="Region Fund" data-sub="Sweeper / Labour" step="0.01" min="0"></div>
+                            <div class="sub-category"><span>IT</span><input type="number" data-cat="Region Fund" data-sub="IT" step="0.01" min="0"></div>
+                            <div class="sub-category"><span>Texco</span><input type="number" data-cat="Region Fund" data-sub="Texco" step="0.01" min="0"></div>
+                            <div class="sub-category"><span>Telephone</span><input type="number" data-cat="Region Fund" data-sub="Telephone" step="0.01" min="0"></div>
+                        </div>
+
+                        <div class="category-block">
+                            <h3>3. Employee Related 1</h3>
+                            <div class="sub-category"><span>Officer TA-Bill</span><input type="number" data-cat="Employee Related Payment 1" data-sub="Officer TA-Bill" step="0.01" min="0"></div>
+                            <div class="sub-category"><span>Apprentice Salary</span><input type="number" data-cat="Employee Related Payment 1" data-sub="Act Apprentice Salary" step="0.01" min="0"></div>
+                            <div class="sub-category"><span>Incentive</span><input type="number" data-cat="Employee Related Payment 1" data-sub="Incentive / TA-Bill" step="0.01" min="0"></div>
+                            <div class="sub-category"><span>RBS</span><input type="number" data-cat="Employee Related Payment 1" data-sub="RBS" step="0.01" min="0"></div>
+                            <div class="sub-category"><span>Union Recovery</span><input type="number" data-cat="Employee Related Payment 1" data-sub="Union / Court Recovery" step="0.01" min="0"></div>
+                            <div class="sub-category"><span>Marriage Adv</span><input type="number" data-cat="Employee Related Payment 1" data-sub="Marriage Advance" step="0.01" min="0"></div>
+                            <div class="sub-category"><span>Interest (EL/PF)</span><input type="number" data-cat="Employee Related Payment 1" data-sub="Interest (EL, PF, CPS, Gratuity)" step="0.01" min="0"></div>
+                            <div class="sub-category"><span>Advance (PF)</span><input type="number" data-cat="Employee Related Payment 1" data-sub="Advance (PF, CPS)" step="0.01" min="0"></div>
+                        </div>
+
+                        <div class="category-block">
+                            <h3>4. Employee Related 2</h3>
+                            <div class="sub-category"><span>Salary</span><input type="number" data-cat="Employee Related Payment 2" data-sub="Salary" step="0.01" min="0"></div>
+                            <div class="sub-category"><span>Bonus</span><input type="number" data-cat="Employee Related Payment 2" data-sub="Bonus" step="0.01" min="0"></div>
+                            <div class="sub-category"><span>Festival Adv</span><input type="number" data-cat="Employee Related Payment 2" data-sub="Festival Advance" step="0.01" min="0"></div>
+                            <div class="sub-category"><span>Performance Inc</span><input type="number" data-cat="Employee Related Payment 2" data-sub="Performance Incentive" step="0.01" min="0"></div>
+                            <div class="sub-category"><span>EL</span><input type="number" data-cat="Employee Related Payment 2" data-sub="EL" step="0.01" min="0"></div>
+                            <div class="sub-category"><span>PF</span><input type="number" data-cat="Employee Related Payment 2" data-sub="PF" step="0.01" min="0"></div>
+                            <div class="sub-category"><span>CPS</span><input type="number" data-cat="Employee Related Payment 2" data-sub="CPS" step="0.01" min="0"></div>
+                            <div class="sub-category"><span>Gratuity</span><input type="number" data-cat="Employee Related Payment 2" data-sub="Gratuity" step="0.01" min="0"></div>
+                        </div>
+
+                        <div class="category-block">
+                            <h3>5. Other Payment</h3>
+                            <div class="sub-category"><span>TDFC Interest</span><input type="number" data-cat="Other Payment" data-sub="TDFC Interest / Repayment" step="0.01" min="0"></div>
+                            <div class="sub-category"><span>Material</span><input type="number" data-cat="Other Payment" data-sub="Material" step="0.01" min="0"></div>
+                            <div class="sub-category"><span>Cess / Toll</span><input type="number" data-cat="Other Payment" data-sub="Cess / Toll" step="0.01" min="0"></div>
+                            <div class="sub-category"><span>MCOP</span><input type="number" data-cat="Other Payment" data-sub="MCOP" step="0.01" min="0"></div>
+                            <div class="sub-category"><span>Bank Clearance</span><input type="number" data-cat="Other Payment" data-sub="Bank Clearance" step="0.01" min="0"></div>
+                        </div>
+                    </div>
+
+                    <div class="form-actions" style="margin-top: 2rem;">
+                        <button type="submit" class="btn-primary">Save Planned Payments</button>
+                    </div>
+                </form>
+
+                <div class="summary-section" style="margin-top: 3rem;">
+                    <h3>Planned Payments Summary</h3>
+                    <table class="master-table">
+                        <thead>
+                            <tr><th>Category</th><th>Sub Category</th><th>Amount (₹)</th></tr>
+                        </thead>
+                        <tbody>
+                            <% entries.forEach(e => { %>
+                                <tr><td><%= e.category %></td><td><%= e.subCategory %></td><td>₹<%= e.amount.toLocaleString() %></td></tr>
+                            <% }) %>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <style>
+        .planning-section { background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .category-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; }
+        .category-block { border: 1px solid #eee; padding: 1rem; border-radius: 8px; background: #fcfcfc; }
+        .category-block h3 { font-size: 0.9rem; margin-top: 0; color: #1a3c5e; border-bottom: 2px solid #1a3c5e; padding-bottom: 0.5rem; margin-bottom: 1rem; }
+        .sub-category { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem; gap: 0.5rem; }
+        .sub-category span { font-size: 0.8rem; font-weight: 500; color: #555; }
+        .sub-category input { width: 100px; padding: 0.4rem; border: 1px solid #ddd; border-radius: 4px; }
+        .btn-primary { background: #1a3c5e; color: white; border: none; padding: 0.8rem 2rem; border-radius: 6px; cursor: pointer; font-weight: 600; }
+        .master-table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+        .master-table th, .master-table td { text-align: left; padding: 0.8rem; border-bottom: 1px solid #eee; }
+        .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
+    </style>
+
+    <script>
+        // Load existing data into inputs
+        const currentEntries = <%- JSON.stringify(entries) %>;
+        currentEntries.forEach(e => {
+            const input = document.querySelector(`input[data-sub="${e.subCategory}"]`);
+            if (input) input.value = e.amount;
+        });
+
+        document.getElementById('planningForm').onsubmit = async (e) => {
+            e.preventDefault();
+            const posDate = document.getElementById('posDate').value;
+            const bankId = e.target.bankId.value;
+            const payments = [];
+            
+            document.querySelectorAll('input[data-sub]').forEach(input => {
+                const amount = parseFloat(input.value) || 0;
+                if (amount > 0) {
+                    payments.push({
+                        category: input.dataset.cat,
+                        subCategory: input.dataset.sub,
+                        amount: amount
+                    });
+                }
+            });
+
+            if (payments.length === 0) {
+                alert('Please enter at least one payment amount');
+                return;
+            }
+
+            try {
+                const res = await fetch('/payment-planning/save', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ positionDate: posDate, bankId, payments })
+                });
+                if (res.ok) {
+                    alert('Planned payments saved successfully');
+                    window.location.reload();
+                }
+            } catch (err) { alert('Save failed'); }
+        };
+    </script>
+</body>
+</html>
