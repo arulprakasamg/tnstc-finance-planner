@@ -144,9 +144,15 @@
                         </thead>
                         <tbody>
                             <% entries.forEach(e => { %>
-                                <tr><td><%= e.category %></td><td><%= e.subCategory %></td><td>₹<%= e.amount.toLocaleString() %></td></tr>
+                                <tr><td><%= e.category %></td><td><%= e.subCategory %></td><td>₹<%= e.amount.toLocaleString('en-IN', { minimumFractionDigits: 2 }) %></td></tr>
                             <% }) %>
                         </tbody>
+                        <tfoot>
+                            <tr style="font-weight: bold; background: #f9f9f9;">
+                                <td colspan="2" style="text-align: right;">Grand Total:</td>
+                                <td id="summaryGrandTotal">₹<%= entries.reduce((sum, e) => sum + e.amount, 0).toLocaleString('en-IN', { minimumFractionDigits: 2 }) %></td>
+                            </tr>
+                        </tfoot>
                     </table>
                 </div>
             </section>
@@ -253,6 +259,12 @@
                 remainingEl.classList.add('negative-balance');
             } else {
                 remainingEl.classList.remove('negative-balance');
+            }
+
+            // Update Summary Table Grand Total
+            const summaryGrandTotalEl = document.getElementById('summaryGrandTotal');
+            if (summaryGrandTotalEl) {
+                summaryGrandTotalEl.innerText = '₹' + totalPlanned.toLocaleString('en-IN', { minimumFractionDigits: 2 });
             }
         }
 
