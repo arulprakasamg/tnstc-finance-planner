@@ -74,8 +74,8 @@ router.get('/', (req, res) => {
                 if (collections[dateStr]) {
                     totalNetCollection += collections[dateStr].netCollection || 0;
                     totalGrossCollection += collections[dateStr].grossCollection || 0;
-                    totalBatta += collections[dateStr].battaAmount || 0;
-                    totalPos += collections[dateStr].posAmount || 0;
+                    totalBatta += collections[dateStr].batta || 0;
+                    totalPos += collections[dateStr].posCharges || 0;
                 }
             }
         }
