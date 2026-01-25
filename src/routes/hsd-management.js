@@ -42,24 +42,20 @@ router.post('/save', (req, res) => {
     
     const entry = {};
     let hasValue = false;
-    
-    // Check all possible company keys
-    const possibleCompanies = ['IOC', 'BPC', 'HPC', 'Retail', 'Ramnad', 'CNG'];
-    
-    possibleCompanies.forEach(co => {
-        const val = parseFloat(companies[co]) || 0;
-        if (val > 0) {
-            entry[co] = val;
+    for (const [co, val] of Object.entries(companies)) {
+        const num = parseFloat(val) || 0;
+        if (num > 0) {
+            entry[co] = num;
             hasValue = true;
         }
-    });
+    }
     
     if (hasValue) {
         data[date] = entry;
         saveHsdData(data);
         res.json({ success: true });
     } else {
-        res.status(400).json({ error: 'Please enter at least one amount' });
+        res.status(400).json({ error: 'Enter at least one amount' });
     }
 });
 
