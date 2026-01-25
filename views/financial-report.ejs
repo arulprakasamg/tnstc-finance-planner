@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Financial Report - TNSTC Finance Planner</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        .report-header { text-align: center; margin-bottom: 2rem; }
+        .report-header h2 { font-size: 1.5rem; color: #1a3c5e; text-transform: uppercase; font-weight: 800; letter-spacing: 1px; }
+        .date-selector-container { background: white; padding: 1.5rem; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); max-width: 400px; margin: 0 auto; display: flex; align-items: center; gap: 1rem; }
+        .date-selector-container label { font-weight: 600; color: #1a3c5e; white-space: nowrap; }
+        .date-selector-container input { padding: 0.6rem; border: 1px solid #ddd; border-radius: 6px; width: 100%; }
+    </style>
+</head>
+<body>
+    <nav class="sidebar">
+        <div class="sidebar-header"><h2>TNSTC Finance</h2></div>
+        <ul class="sidebar-menu">
+            <li><a href="/">Dashboard</a></li>
+            <li><a href="/bank-balances">Bank Balances</a></li>
+            <li><a href="/daily-collections">Daily Collections</a></li>
+            <li><a href="/payment-planning">Payment Planning</a></li>
+            <li><a href="/hsd-management">HSD Management</a></li>
+            <li><a href="/financial-report" class="active">Financial Report</a></li>
+        </ul>
+    </nav>
+    <div class="main-content">
+        <header>
+            <h1>Financial Report</h1>
+            <p class="date-range">Finance Position Analysis</p>
+        </header>
+        <main class="container">
+            <div class="report-header">
+                <h2>TNSTC KUMBAKONAM – FINANCE POSITION</h2>
+            </div>
+            <div class="date-selector-container">
+                <label for="positionDate">Position Date</label>
+                <input type="date" id="positionDate" value="<%= today %>">
+            </div>
+        </main>
+    </div>
+</body>
+</html>
