@@ -21,6 +21,7 @@ router.get('/', (req, res) => {
 
     const COLLECTIONS_PATH = path.join(__dirname, '../data/daily_collections.json');
     const PAYMENTS_PATH = path.join(__dirname, '../data/planned_payments.json');
+    const HSD_DATA_PATH = path.join(__dirname, '../data/hsd_purchase.json');
 
     let bankData = [];
     let totalBankBalance = 0;
@@ -38,8 +39,6 @@ router.get('/', (req, res) => {
     let hsdGrandTotals = {
         IOC: 0, BPC: 0, HPC: 0, Retail: 0, Ramnad: 0, CNG: 0, Total: 0
     };
-
-    const HSD_DATA_PATH = path.join(__dirname, '../data/hsd_purchase.json');
 
     try {
         const banksMaster = JSON.parse(fs.readFileSync(MASTER_DATA_PATH, 'utf8'));
