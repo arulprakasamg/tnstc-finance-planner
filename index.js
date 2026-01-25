@@ -104,7 +104,7 @@ app.use('/', dashboardRoutes);
 app.use('/bank-balances', bankBalancesRoutes);
 app.use('/daily-collections', dailyCollectionsRoutes);
 app.use('/payment-planning', paymentPlanningRoutes);
-app.use('/hsd', hsdManagementRoutes);
+app.use('/hsd-management', hsdManagementRoutes);
 
 app.listen(PORT, '0.0.0.0', () => {
     console.log(`TNSTC Finance Planner running at http://0.0.0.0:${PORT}`);
