@@ -306,6 +306,15 @@
                 return;
             }
 
+            // Hard Validation: Total Planned Amount > Available Fund
+            let totalPlanned = 0;
+            payments.forEach(p => totalPlanned += p.amount);
+            
+            if (totalPlanned > rawAvailableFund) {
+                alert('Planned amount exceeds available net collection.');
+                return;
+            }
+
             try {
                 const res = await fetch('/payment-planning/save', {
                     method: 'POST',
