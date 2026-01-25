@@ -34,6 +34,10 @@ router.get('/', (req, res) => {
     let otherPaymentsList = [];
     let hsdPaymentsList = [];
     let hsdTotal = 0;
+    let hsdOutstandingHistory = [];
+    let hsdGrandTotals = {
+        IOC: 0, BPC: 0, HPC: 0, Retail: 0, Ramnad: 0, CNG: 0, Total: 0
+    };
 
     const HSD_DATA_PATH = path.join(__dirname, '../data/hsd_purchase.json');
 
@@ -61,9 +65,11 @@ router.get('/', (req, res) => {
             }
         }
 
-        // HSD Data for right column
+        // HSD Data
         if (fs.existsSync(HSD_DATA_PATH)) {
             const hsdData = JSON.parse(fs.readFileSync(HSD_DATA_PATH, 'utf8'));
+            
+            // 1. Current day breakdown for payments column
             const record = hsdData.find(r => r.date === positionDate);
             const HSD_ORDER = ["IOC", "BPC", "HPC", "Retail", "Ramnad", "CNG"];
             const HSD_DISPLAY_NAMES = {
@@ -80,6 +86,29 @@ router.get('/', (req, res) => {
                 hsdTotal += amount;
                 return { name: HSD_DISPLAY_NAMES[key], amount };
             });
+
+            // 2. Historical outstanding up to positionDate
+            hsdOutstandingHistory = hsdData
+                .filter(r => r.date <= positionDate)
+                .sort((a, b) => new Date(a.date) - new Date(b.date))
+                .map(r => {
+                    const rowTotal = (r.IOC || 0) + (r.BPC || 0) + (r.HPC || 0) + (r.Retail || 0) + (r.Ramnad || 0) + (r.CNG || 0);
+                    
+                    hsdGrandTotals.IOC += (r.IOC || 0);
+                    hsdGrandTotals.BPC += (r.BPC || 0);
+                    hsdGrandTotals.HPC += (r.HPC || 0);
+                    hsdGrandTotals.Retail += (r.Retail || 0);
+                    hsdGrandTotals.Ramnad += (r.Ramnad || 0);
+                    hsdGrandTotals.CNG += (r.CNG || 0);
+                    hsdGrandTotals.Total += rowTotal;
+
+                    const [y, m, d] = r.date.split('-');
+                    return {
+                        ...r,
+                        formattedDate: `${d}/${m}/${y}`,
+                        total: rowTotal
+                    };
+                });
         }
 
         // Expense Data
@@ -130,7 +159,9 @@ router.get('/', (req, res) => {
         expenseInfo,
         otherPaymentsList,
         hsdPaymentsList,
-        hsdTotal
+        hsdTotal,
+        hsdOutstandingHistory,
+        hsdGrandTotals
     });
 });
 

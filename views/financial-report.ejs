@@ -201,6 +201,60 @@
                     </div>
                 </div>
             </section>
+            <!-- HSD Outstanding Section -->
+            <section class="report-section">
+                <div class="section-title">
+                    HSD OUTSTANDING
+                </div>
+                <% if (hsdOutstandingHistory.length > 0) { %>
+                <table class="horizontal-table" style="text-align: right;">
+                    <thead>
+                        <tr>
+                            <th style="text-align: center; width: 60px;">S.No</th>
+                            <th style="text-align: center; width: 120px;">Date</th>
+                            <th style="text-align: right;">IOC</th>
+                            <th style="text-align: right;">BPC</th>
+                            <th style="text-align: right;">HPC</th>
+                            <th style="text-align: right;">Retail / Confed</th>
+                            <th style="text-align: right;">Ramnad</th>
+                            <th style="text-align: right;">CNG</th>
+                            <th style="text-align: right;">Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% hsdOutstandingHistory.forEach((r, index) => { %>
+                            <tr>
+                                <td style="text-align: center; background: none; font-weight: 400;"><%= index + 1 %></td>
+                                <td style="text-align: center; background: none; font-weight: 400;"><%= r.formattedDate %></td>
+                                <td><%= (r.IOC / 100000).toFixed(2) %></td>
+                                <td><%= (r.BPC / 100000).toFixed(2) %></td>
+                                <td><%= (r.HPC / 100000).toFixed(2) %></td>
+                                <td><%= (r.Retail / 100000).toFixed(2) %></td>
+                                <td><%= (r.Ramnad / 100000).toFixed(2) %></td>
+                                <td><%= (r.CNG / 100000).toFixed(2) %></td>
+                                <td style="font-weight: 800;"><%= (r.total / 100000).toFixed(2) %></td>
+                            </tr>
+                        <% }) %>
+                    </tbody>
+                    <tfoot style="background: #f8fafc; font-weight: 800; border-top: 2px solid #1a3c5e;">
+                        <tr>
+                            <td colspan="2" style="text-align: right;">TOTAL</td>
+                            <td><%= (hsdGrandTotals.IOC / 100000).toFixed(2) %></td>
+                            <td><%= (hsdGrandTotals.BPC / 100000).toFixed(2) %></td>
+                            <td><%= (hsdGrandTotals.HPC / 100000).toFixed(2) %></td>
+                            <td><%= (hsdGrandTotals.Retail / 100000).toFixed(2) %></td>
+                            <td><%= (hsdGrandTotals.Ramnad / 100000).toFixed(2) %></td>
+                            <td><%= (hsdGrandTotals.CNG / 100000).toFixed(2) %></td>
+                            <td style="color: #1a3c5e;"><%= (hsdGrandTotals.Total / 100000).toFixed(2) %></td>
+                        </tr>
+                    </tfoot>
+                </table>
+                <% } else { %>
+                <div style="text-align: center; padding: 2rem; background: white; border: 1px solid #e2e8f0; border-radius: 8px; color: #64748b; font-style: italic;">
+                    No HSD Outstanding Data
+                </div>
+                <% } %>
+            </section>
         </main>
     </div>
 </body>
