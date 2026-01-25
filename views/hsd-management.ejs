@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HSD Management - TNSTC Finance Planner</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        .hsd-container { background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
+        .input-group { display: flex; flex-direction: column; gap: 0.5rem; }
+        .input-group label { font-size: 0.85rem; font-weight: 600; color: #1a3c5e; }
+        .input-group input { padding: 0.8rem; border: 1px solid #ddd; border-radius: 6px; }
+        .btn-primary { background: #1a3c5e; color: white; border: none; padding: 0.8rem 2rem; border-radius: 6px; cursor: pointer; font-weight: 600; }
+        .hsd-table { width: 100%; border-collapse: collapse; margin-top: 2rem; }
+        .hsd-table th, .hsd-table td { text-align: left; padding: 1rem; border-bottom: 1px solid #eee; font-size: 0.9rem; }
+        .hsd-table th { background: #f8f9fa; color: #1a3c5e; font-weight: 700; }
+        .action-btn { padding: 0.4rem 0.8rem; border-radius: 4px; cursor: pointer; font-size: 0.8rem; border: none; margin-right: 0.5rem; }
+        .btn-edit { background: #e3f2fd; color: #1976d2; }
+        .btn-delete { background: #ffebee; color: #d32f2f; }
+    </style>
+</head>
+<body>
+    <nav class="sidebar">
+        <div class="sidebar-header"><h2>TNSTC Finance</h2></div>
+        <ul class="sidebar-menu">
+            <li><a href="/">Dashboard</a></li>
+            <li><a href="/bank-balances">Bank Balances</a></li>
+            <li><a href="/daily-collections">Daily Collections</a></li>
+            <li><a href="/payment-planning">Payment Planning</a></li>
+            <li><a href="/hsd" class="active">HSD Management</a></li>
+            <li><a href="#">Financial Reports</a></li>
+        </ul>
+    </nav>
+    <div class="main-content">
+        <header>
+            <h1>HSD Purchase Entry</h1>
+            <p class="date-range">Capture Daily HSD Purchases</p>
+        </header>
+        <main class="container">
+            <div class="hsd-container">
+                <form id="hsdForm">
+                    <div class="input-group" style="margin-bottom: 2rem; max-width: 300px;">
+                        <label>Position Date *</label>
+                        <input type="date" id="hsdDate" name="date" value="<%= today %>" required>
+                    </div>
+                    
+                    <div class="form-grid">
+                        <div class="input-group"><label>IOC</label><input type="number" step="0.01" name="IOC" class="comp-input"></div>
+                        <div class="input-group"><label>BPC</label><input type="number" step="0.01" name="BPC" class="comp-input"></div>
+                        <div class="input-group"><label>HPC</label><input type="number" step="0.01" name="HPC" class="comp-input"></div>
+                        <div class="input-group"><label>Retail / Confed</label><input type="number" step="0.01" name="Retail" class="comp-input"></div>
+                        <div class="input-group"><label>Ramnad</label><input type="number" step="0.01" name="Ramnad" class="comp-input"></div>
+                        <div class="input-group"><label>CNG</label><input type="number" step="0.01" name="CNG" class="comp-input"></div>
+                    </div>
+                    
+                    <button type="submit" class="btn-primary">Save Purchase Entry</button>
+                </form>
+
+                <table class="hsd-table">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Retail</th>
+                            <th>HPC</th>
+                            <th>BPC</th>
+                            <th>IOC</th>
+                            <th>Ramnad</th>
+                            <th>CNG</th>
+                            <th>Total</th>
+                            <th>Balance</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% records.forEach(r => { %>
+                            <tr>
+                                <td><%= r.formattedDate %></td>
+                                <td><%= (r.Retail || 0).toLocaleString('en-IN') %></td>
+                                <td><%= (r.HPC || 0).toLocaleString('en-IN') %></td>
+                                <td><%= (r.BPC || 0).toLocaleString('en-IN') %></td>
+                                <td><%= (r.IOC || 0).toLocaleString('en-IN') %></td>
+                                <td><%= (r.Ramnad || 0).toLocaleString('en-IN') %></td>
+                                <td><%= (r.CNG || 0).toLocaleString('en-IN') %></td>
+                                <td style="font-weight: bold;">₹<%= r.total.toLocaleString('en-IN') %></td>
+                                <td>₹<%= r.total.toLocaleString('en-IN') %></td>
+                                <td>
+                                    <button class="action-btn btn-edit" onclick="editEntry('<%= r.date %>', <%= JSON.stringify(r) %>)">Edit</button>
+                                    <button class="action-btn btn-delete" onclick="deleteEntry('<%= r.date %>')">Delete</button>
+                                </td>
+                            </tr>
+                        <% }) %>
+                    </tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        document.getElementById('hsdForm').onsubmit = async (e) => {
+            e.preventDefault();
+            const date = document.getElementById('hsdDate').value;
+            const companies = {};
+            document.querySelectorAll('.comp-input').forEach(input => {
+                companies[input.name] = input.value;
+            });
+
+            try {
+                const res = await fetch('/hsd/save', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ date, companies })
+                });
+                if (res.ok) window.location.reload();
+                else alert('Please enter at least one amount');
+            } catch (err) { alert('Error saving entry'); }
+        };
+
+        function editEntry(date, data) {
+            document.getElementById('hsdDate').value = date;
+            document.querySelectorAll('.comp-input').forEach(input => {
+                input.value = data[input.name] || '';
+            });
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        async function deleteEntry(date) {
+            if (!confirm('Delete this entry?')) return;
+            try {
+                const res = await fetch('/hsd/delete', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ date })
+                });
+                if (res.ok) window.location.reload();
+            } catch (err) { alert('Error deleting entry'); }
+        }
+    </script>
+</body>
+</html>
