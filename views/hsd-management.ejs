@@ -46,12 +46,12 @@
                     </div>
                     
                     <div class="form-grid">
-                        <div class="input-group"><label>IOC</label><input type="number" step="0.01" name="IOC" class="comp-input"></div>
-                        <div class="input-group"><label>BPC</label><input type="number" step="0.01" name="BPC" class="comp-input"></div>
-                        <div class="input-group"><label>HPC</label><input type="number" step="0.01" name="HPC" class="comp-input"></div>
-                        <div class="input-group"><label>Retail / Confed</label><input type="number" step="0.01" name="Retail" class="comp-input"></div>
-                        <div class="input-group"><label>Ramnad</label><input type="number" step="0.01" name="Ramnad" class="comp-input"></div>
-                        <div class="input-group"><label>CNG</label><input type="number" step="0.01" name="CNG" class="comp-input"></div>
+                        <div class="input-group"><label>IOC</label><input type="number" step="0.01" name="IOC" class="comp-input" value="0.00"></div>
+                        <div class="input-group"><label>BPC</label><input type="number" step="0.01" name="BPC" class="comp-input" value="0.00"></div>
+                        <div class="input-group"><label>HPC</label><input type="number" step="0.01" name="HPC" class="comp-input" value="0.00"></div>
+                        <div class="input-group"><label>Retail / Confed</label><input type="number" step="0.01" name="Retail" class="comp-input" value="0.00"></div>
+                        <div class="input-group"><label>Ramnad</label><input type="number" step="0.01" name="Ramnad" class="comp-input" value="0.00"></div>
+                        <div class="input-group"><label>CNG</label><input type="number" step="0.01" name="CNG" class="comp-input" value="0.00"></div>
                     </div>
                     
                     <button type="submit" class="btn-primary">Save Purchase Entry</button>
@@ -97,8 +97,22 @@
     </div>
 
     <script>
+        document.querySelectorAll('.comp-input').forEach(input => {
+            input.addEventListener('blur', function() {
+                const val = parseFloat(this.value) || 0;
+                this.value = val.toFixed(2);
+            });
+        });
+
         document.getElementById('hsdForm').onsubmit = async (e) => {
             e.preventDefault();
+            
+            // Format all inputs to 2 decimal places before processing
+            document.querySelectorAll('.comp-input').forEach(input => {
+                const val = parseFloat(input.value) || 0;
+                input.value = val.toFixed(2);
+            });
+
             const date = document.getElementById('hsdDate').value;
             
             // Validation logic: correctly detect entered HSD amounts
@@ -151,7 +165,8 @@
         function editEntry(date, data) {
             document.getElementById('hsdDate').value = date;
             document.querySelectorAll('.comp-input').forEach(input => {
-                input.value = data[input.name] || '';
+                const val = parseFloat(data[input.name]) || 0;
+                input.value = val.toFixed(2);
             });
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
