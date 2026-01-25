@@ -56,10 +56,10 @@
                     <h3>Oil Company-wise Outstanding</h3>
                     <div class="company-list">
                         <div class="company-item"><span>IOC</span> <span>₹<%= summary.companyWise.IOC.toFixed(2) %></span></div>
-                        <div class="company-item"><span>BPC</span> <span>₹<%= summary.companyWise.BPC.toFixed(2) %></span></div>
-                        <div class="company-item"><span>HPC</span> <span>₹<%= summary.companyWise.HPC.toFixed(2) %></span></div>
                         <div class="company-item"><span>Retail / Confed</span> <span>₹<%= summary.companyWise.Retail.toFixed(2) %></span></div>
+                        <div class="company-item"><span>BPC</span> <span>₹<%= summary.companyWise.BPC.toFixed(2) %></span></div>
                         <div class="company-item"><span>Ramnad</span> <span>₹<%= summary.companyWise.Ramnad.toFixed(2) %></span></div>
+                        <div class="company-item"><span>HPC</span> <span>₹<%= summary.companyWise.HPC.toFixed(2) %></span></div>
                         <div class="company-item"><span>CNG</span> <span>₹<%= summary.companyWise.CNG.toFixed(2) %></span></div>
                     </div>
                 </div>
@@ -89,10 +89,10 @@
                     <thead>
                         <tr>
                             <th>Date</th>
-                            <th>Retail</th>
-                            <th>HPC</th>
-                            <th>BPC</th>
                             <th>IOC</th>
+                            <th>BPC</th>
+                            <th>HPC</th>
+                            <th>Retail</th>
                             <th>Ramnad</th>
                             <th>CNG</th>
                             <th>Total</th>
@@ -105,10 +105,10 @@
                         <% records.forEach(r => { %>
                             <tr>
                                 <td><%= r.formattedDate %></td>
-                                <td><%= (r.Retail || 0).toFixed(2) %></td>
-                                <td><%= (r.HPC || 0).toFixed(2) %></td>
-                                <td><%= (r.BPC || 0).toFixed(2) %></td>
                                 <td><%= (r.IOC || 0).toFixed(2) %></td>
+                                <td><%= (r.BPC || 0).toFixed(2) %></td>
+                                <td><%= (r.HPC || 0).toFixed(2) %></td>
+                                <td><%= (r.Retail || 0).toFixed(2) %></td>
                                 <td><%= (r.Ramnad || 0).toFixed(2) %></td>
                                 <td><%= (r.CNG || 0).toFixed(2) %></td>
                                 <td style="font-weight: bold;">₹<%= (r.total || 0).toFixed(2) %></td>
@@ -124,10 +124,10 @@
                     <tfoot style="background: #f8f9fa; font-weight: bold; border-top: 2px solid #dee2e6;">
                         <tr>
                             <td>Total</td>
-                            <td><%= summary.companyWise.Retail.toFixed(2) %></td>
-                            <td><%= summary.companyWise.HPC.toFixed(2) %></td>
-                            <td><%= summary.companyWise.BPC.toFixed(2) %></td>
                             <td><%= summary.companyWise.IOC.toFixed(2) %></td>
+                            <td><%= summary.companyWise.BPC.toFixed(2) %></td>
+                            <td><%= summary.companyWise.HPC.toFixed(2) %></td>
+                            <td><%= summary.companyWise.Retail.toFixed(2) %></td>
                             <td><%= summary.companyWise.Ramnad.toFixed(2) %></td>
                             <td><%= summary.companyWise.CNG.toFixed(2) %></td>
                             <td>₹<%= summary.totalOutstanding.toFixed(2) %></td>
