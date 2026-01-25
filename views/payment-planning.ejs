@@ -52,17 +52,20 @@
                     <input type="hidden" name="positionDate" value="<%= positionDate %>">
                     <div class="form-group" style="margin-bottom: 2rem;">
                         <label>Bank Account *</label>
-                        <select name="bankId" required style="width: 100%; padding: 0.8rem; border-radius: 6px;">
+                        <select name="bankId" id="bankSelect" required style="width: 100%; padding: 0.8rem; border-radius: 6px;" onchange="window.location.href='/payment-planning?positionDate=' + document.getElementById('posDate').value + '&bankId=' + this.value">
                             <% banks.forEach(bank => { %>
-                                <option value="<%= bank.id %>"><%= bank.bankName %> - <%= bank.accountNumber %></option>
+                                <option value="<%= bank.id %>" <%= bankId === bank.id ? 'selected' : '' %>><%= bank.bankName %> - <%= bank.accountNumber %></option>
                             <% }) %>
                         </select>
                     </div>
 
                     <div class="category-grid">
                         <!-- Category blocks will be here -->
-                        <div class="category-block">
-                            <h3>1. Oil Companies</h3>
+                        <div class="category-block" data-category="Oil Companies">
+                            <div class="category-header">
+                                <h3>1. Oil Companies</h3>
+                                <span class="category-total" id="total-Oil-Companies">₹0.00</span>
+                            </div>
                             <div class="sub-category"><span>IOC</span><input type="number" data-cat="Oil Companies" data-sub="IOC" step="0.01" min="0"></div>
                             <div class="sub-category"><span>BPC</span><input type="number" data-cat="Oil Companies" data-sub="BPC" step="0.01" min="0"></div>
                             <div class="sub-category"><span>HPC</span><input type="number" data-cat="Oil Companies" data-sub="HPC" step="0.01" min="0"></div>
@@ -71,8 +74,11 @@
                             <div class="sub-category"><span>CNG</span><input type="number" data-cat="Oil Companies" data-sub="CNG" step="0.01" min="0"></div>
                         </div>
 
-                        <div class="category-block">
-                            <h3>2. Region Fund</h3>
+                        <div class="category-block" data-category="Region Fund">
+                            <div class="category-header">
+                                <h3>2. Region Fund</h3>
+                                <span class="category-total" id="total-Region-Fund">₹0.00</span>
+                            </div>
                             <div class="sub-category"><span>MV Tax</span><input type="number" data-cat="Region Fund" data-sub="MV Tax" step="0.01" min="0"></div>
                             <div class="sub-category"><span>Canteen</span><input type="number" data-cat="Region Fund" data-sub="Canteen" step="0.01" min="0"></div>
                             <div class="sub-category"><span>EB</span><input type="number" data-cat="Region Fund" data-sub="EB" step="0.01" min="0"></div>
@@ -82,8 +88,11 @@
                             <div class="sub-category"><span>Telephone</span><input type="number" data-cat="Region Fund" data-sub="Telephone" step="0.01" min="0"></div>
                         </div>
 
-                        <div class="category-block">
-                            <h3>3. Employee Related Payment 1 (Own Fund)</h3>
+                        <div class="category-block" data-category="Employee Related Payment 1 (Own Fund)">
+                            <div class="category-header">
+                                <h3>3. Employee Related Payment 1 (Own Fund)</h3>
+                                <span class="category-total" id="total-Employee-Related-Payment-1-(Own-Fund)">₹0.00</span>
+                            </div>
                             <div class="sub-category"><span>Officer TA-Bill</span><input type="number" data-cat="Employee Related Payment 1 (Own Fund)" data-sub="Officer TA-Bill" step="0.01" min="0"></div>
                             <div class="sub-category"><span>Act Apprentice Salary</span><input type="number" data-cat="Employee Related Payment 1 (Own Fund)" data-sub="Act Apprentice Salary" step="0.01" min="0"></div>
                             <div class="sub-category"><span>Incentive / TA-Bill</span><input type="number" data-cat="Employee Related Payment 1 (Own Fund)" data-sub="Incentive / TA-Bill" step="0.01" min="0"></div>
@@ -94,8 +103,11 @@
                             <div class="sub-category"><span>Advance (PF, CPS)</span><input type="number" data-cat="Employee Related Payment 1 (Own Fund)" data-sub="Advance (PF, CPS)" step="0.01" min="0"></div>
                         </div>
 
-                        <div class="category-block">
-                            <h3>4. Employee Related Payment 2 (TDFC / Govt Fund)</h3>
+                        <div class="category-block" data-category="Employee Related Payment 2 (TDFC / Govt Fund)">
+                            <div class="category-header">
+                                <h3>4. Employee Related Payment 2 (TDFC / Govt Fund)</h3>
+                                <span class="category-total" id="total-Employee-Related-Payment-2-(TDFC-/-Govt-Fund)">₹0.00</span>
+                            </div>
                             <div class="sub-category"><span>Salary</span><input type="number" data-cat="Employee Related Payment 2 (TDFC / Govt Fund)" data-sub="Salary" step="0.01" min="0"></div>
                             <div class="sub-category"><span>Bonus</span><input type="number" data-cat="Employee Related Payment 2 (TDFC / Govt Fund)" data-sub="Bonus" step="0.01" min="0"></div>
                             <div class="sub-category"><span>Festival Advance</span><input type="number" data-cat="Employee Related Payment 2 (TDFC / Govt Fund)" data-sub="Festival Advance" step="0.01" min="0"></div>
@@ -106,8 +118,11 @@
                             <div class="sub-category"><span>Gratuity</span><input type="number" data-cat="Employee Related Payment 2 (TDFC / Govt Fund)" data-sub="Gratuity" step="0.01" min="0"></div>
                         </div>
 
-                        <div class="category-block">
-                            <h3>5. Other Payment</h3>
+                        <div class="category-block" data-category="Other Payment">
+                            <div class="category-header">
+                                <h3>5. Other Payment</h3>
+                                <span class="category-total" id="total-Other-Payment">₹0.00</span>
+                            </div>
                             <div class="sub-category"><span>TDFC Interest / Repayment</span><input type="number" data-cat="Other Payment" data-sub="TDFC Interest / Repayment" step="0.01" min="0"></div>
                             <div class="sub-category"><span>Material</span><input type="number" data-cat="Other Payment" data-sub="Material" step="0.01" min="0"></div>
                             <div class="sub-category"><span>Cess / Toll</span><input type="number" data-cat="Other Payment" data-sub="Cess / Toll" step="0.01" min="0"></div>
@@ -167,6 +182,26 @@
             font-size: 1.5rem;
             font-weight: 800;
         }
+        .category-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #1a3c5e;
+            padding-bottom: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        .category-header h3 {
+            font-size: 0.9rem;
+            margin: 0;
+            color: #1a3c5e;
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+        .category-total {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: #1a3c5e;
+        }
         .highlight-planned { color: #f39c12; }
         .negative-balance { color: #ff6b6b !important; }
 
@@ -189,8 +224,23 @@
         
         function updateFundSummary() {
             let totalPlanned = 0;
+            const categoryTotals = {};
+
             document.querySelectorAll('input[data-sub]').forEach(input => {
-                totalPlanned += parseFloat(input.value) || 0;
+                const val = parseFloat(input.value) || 0;
+                totalPlanned += val;
+                
+                const cat = input.dataset.cat;
+                categoryTotals[cat] = (categoryTotals[cat] || 0) + val;
+            });
+
+            // Update category running totals
+            Object.keys(categoryTotals).forEach(cat => {
+                const safeId = 'total-' + cat.replace(/ /g, '-').replace(/\//g, '-').replace(/\(/g, '-').replace(/\)/g, '-');
+                const el = document.getElementById(safeId);
+                if (el) {
+                    el.innerText = '₹' + categoryTotals[cat].toLocaleString('en-IN', { minimumFractionDigits: 2 });
+                }
             });
 
             const remaining = rawAvailableFund - totalPlanned;

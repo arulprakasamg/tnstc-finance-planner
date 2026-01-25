@@ -21,28 +21,13 @@ router.get('/', (req, res) => {
     const banks = JSON.parse(fs.readFileSync(MASTER_DATA_PATH, 'utf8') || '[]');
     const today = new Date().toISOString().split('T')[0];
     const positionDate = req.query.positionDate || today;
+    const bankId = req.query.bankId || (banks.length > 0 ? banks[0].id : null);
     
-    // Calculate Available Fund
-    const BALANCES_DATA_PATH = path.join(__dirname, '../data/bank_balances_daily.json');
+    // Calculate Available Fund (Net Collection ONLY)
     const COLLECTIONS_DATA_PATH = path.join(__dirname, '../data/daily_collections.json');
-    
-    let totalBankBalance = 0;
     let netCollection = 0;
 
     try {
-        if (fs.existsSync(BALANCES_DATA_PATH)) {
-            const dailyBalances = JSON.parse(fs.readFileSync(BALANCES_DATA_PATH, 'utf8'));
-            const availableDates = Object.keys(dailyBalances).sort();
-            
-            banks.forEach(bank => {
-                // Rolling logic: find latest balance on or before positionDate
-                const effectiveDate = availableDates.slice().reverse().find(d => d <= positionDate && dailyBalances[d][bank.id] !== undefined);
-                if (effectiveDate) {
-                    totalBankBalance += dailyBalances[effectiveDate][bank.id] || 0;
-                }
-            });
-        }
-        
         if (fs.existsSync(COLLECTIONS_DATA_PATH)) {
             const collections = JSON.parse(fs.readFileSync(COLLECTIONS_DATA_PATH, 'utf8'));
             if (collections[positionDate]) {
@@ -53,24 +38,34 @@ router.get('/', (req, res) => {
         console.error('Error calculating funds:', err);
     }
 
-    const availableFund = totalBankBalance + netCollection;
-    const entries = planning[positionDate] || [];
-    res.render('payment-planning', { entries, positionDate, banks, availableFund });
+    const availableFund = netCollection;
+    const allEntries = planning[positionDate] || [];
+    // Filter entries by bankId
+    const entries = allEntries.filter(e => e.bankId === bankId);
+    
+    res.render('payment-planning', { entries, positionDate, bankId, banks, availableFund });
 });
 
 router.post('/save', (req, res) => {
     const { positionDate, bankId, payments } = req.body;
     const planning = getPlanning();
     
-    // payments is expected to be an array of { category, subCategory, amount }
+    if (!planning[positionDate]) planning[positionDate] = [];
+    
+    // Remove existing entries for this bank and date to overwrite
+    planning[positionDate] = planning[positionDate].filter(e => e.bankId !== bankId);
+    
+    // Add new entries with bankId
     const validPayments = payments.filter(p => parseFloat(p.amount) > 0).map(p => ({
-        ...p,
-        bankId,
+        category: p.category,
+        subCategory: p.subCategory,
         amount: parseFloat(p.amount),
+        bankId,
         updatedAt: new Date().toISOString()
     }));
-
-    planning[positionDate] = validPayments;
+    
+    planning[positionDate].push(...validPayments);
+    
     savePlanning(planning);
     res.json({ success: true });
 });

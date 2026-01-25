@@ -7,5 +7,133 @@
       "bankId": "1",
       "updatedAt": "2026-01-24T17:18:58.486Z"
     }
+  ],
+  "2026-01-25": [
+    {
+      "category": "Oil Companies",
+      "subCategory": "IOC",
+      "amount": 400,
+      "bankId": "1",
+      "updatedAt": "2026-01-25T02:43:19.083Z"
+    },
+    {
+      "category": "Oil Companies",
+      "subCategory": "BPC",
+      "amount": 300,
+      "bankId": "1",
+      "updatedAt": "2026-01-25T02:43:19.083Z"
+    },
+    {
+      "category": "Oil Companies",
+      "subCategory": "HPC",
+      "amount": 100,
+      "bankId": "1",
+      "updatedAt": "2026-01-25T02:43:19.083Z"
+    },
+    {
+      "category": "Oil Companies",
+      "subCategory": "Retail / Confed",
+      "amount": 4,
+      "bankId": "1",
+      "updatedAt": "2026-01-25T02:43:19.083Z"
+    },
+    {
+      "category": "Oil Companies",
+      "subCategory": "Ramnad",
+      "amount": 3,
+      "bankId": "1",
+      "updatedAt": "2026-01-25T02:43:19.083Z"
+    },
+    {
+      "category": "Oil Companies",
+      "subCategory": "CNG",
+      "amount": 1,
+      "bankId": "1",
+      "updatedAt": "2026-01-25T02:43:19.083Z"
+    },
+    {
+      "category": "Region Fund",
+      "subCategory": "MV Tax",
+      "amount": 2,
+      "bankId": "1",
+      "updatedAt": "2026-01-25T02:43:19.083Z"
+    },
+    {
+      "category": "Region Fund",
+      "subCategory": "Canteen",
+      "amount": 2,
+      "bankId": "1",
+      "updatedAt": "2026-01-25T02:43:19.083Z"
+    },
+    {
+      "category": "Region Fund",
+      "subCategory": "EB",
+      "amount": 2,
+      "bankId": "1",
+      "updatedAt": "2026-01-25T02:43:19.083Z"
+    },
+    {
+      "category": "Region Fund",
+      "subCategory": "Sweeper / Labour / RC & RT",
+      "amount": 1,
+      "bankId": "1",
+      "updatedAt": "2026-01-25T02:43:19.083Z"
+    },
+    {
+      "category": "Employee Related Payment 1 (Own Fund)",
+      "subCategory": "Officer TA-Bill",
+      "amount": 2,
+      "bankId": "1",
+      "updatedAt": "2026-01-25T02:43:19.083Z"
+    },
+    {
+      "category": "Employee Related Payment 1 (Own Fund)",
+      "subCategory": "Act Apprentice Salary",
+      "amount": 1,
+      "bankId": "1",
+      "updatedAt": "2026-01-25T02:43:19.083Z"
+    },
+    {
+      "category": "Employee Related Payment 1 (Own Fund)",
+      "subCategory": "Advance (PF, CPS)",
+      "amount": 10,
+      "bankId": "1",
+      "updatedAt": "2026-01-25T02:43:19.083Z"
+    },
+    {
+      "category": "Employee Related Payment 2 (TDFC / Govt Fund)",
+      "subCategory": "Gratuity",
+      "amount": 15,
+      "bankId": "1",
+      "updatedAt": "2026-01-25T02:43:19.083Z"
+    },
+    {
+      "category": "Other Payment",
+      "subCategory": "TDFC Interest / Repayment",
+      "amount": 11,
+      "bankId": "1",
+      "updatedAt": "2026-01-25T02:43:19.083Z"
+    },
+    {
+      "category": "Other Payment",
+      "subCategory": "Material",
+      "amount": 10,
+      "bankId": "1",
+      "updatedAt": "2026-01-25T02:43:19.083Z"
+    },
+    {
+      "category": "Other Payment",
+      "subCategory": "Cess / Toll",
+      "amount": 15,
+      "bankId": "1",
+      "updatedAt": "2026-01-25T02:43:19.083Z"
+    },
+    {
+      "category": "Other Payment",
+      "subCategory": "Bank Clearance",
+      "amount": 15,
+      "bankId": "1",
+      "updatedAt": "2026-01-25T02:43:19.083Z"
+    }
   ]
 }
