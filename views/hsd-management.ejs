@@ -101,13 +101,20 @@
             e.preventDefault();
             const date = document.getElementById('hsdDate').value;
             
-            const iocVal = Number(document.querySelector('input[name="IOC"]').value) || 0;
-            const bpcVal = Number(document.querySelector('input[name="BPC"]').value) || 0;
-            const hpcVal = Number(document.querySelector('input[name="HPC"]').value) || 0;
-            const retailVal = Number(document.querySelector('input[name="Retail"]').value) || 0;
-            const ramnadVal = Number(document.querySelector('input[name="Ramnad"]').value) || 0;
-            const cngVal = Number(document.querySelector('input[name="CNG"]').value) || 0;
+            // Validation logic: correctly detect entered HSD amounts
+            const getVal = (name) => {
+                const input = document.querySelector(`input[name="${name}"]`);
+                return input ? (Number(input.value) || 0) : 0;
+            };
 
+            const iocVal = getVal("IOC");
+            const bpcVal = getVal("BPC");
+            const hpcVal = getVal("HPC");
+            const retailVal = getVal("Retail");
+            const ramnadVal = getVal("Ramnad");
+            const cngVal = getVal("CNG");
+
+            // Convert empty values to 0 and check if at least ONE of the fields has a value > 0
             const hasAmount = (iocVal > 0 || bpcVal > 0 || hpcVal > 0 || retailVal > 0 || ramnadVal > 0 || cngVal > 0);
 
             if (!hasAmount) {
@@ -125,14 +132,20 @@
             };
 
             try {
-                const res = await fetch('/hsd/save', {
+                const res = await fetch('/hsd-management/save', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ date, companies })
                 });
-                if (res.ok) window.location.reload();
-                else alert('Please enter at least one amount');
-            } catch (err) { alert('Error saving entry'); }
+                if (res.ok) {
+                    window.location.reload();
+                } else {
+                    const errData = await res.json();
+                    alert(errData.error || 'Please enter at least one amount');
+                }
+            } catch (err) { 
+                alert('Error saving entry'); 
+            }
         };
 
         function editEntry(date, data) {
