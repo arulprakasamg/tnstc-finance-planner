@@ -32,6 +32,10 @@ router.get('/', (req, res) => {
         balance: 0
     };
     let otherPaymentsList = [];
+    let hsdPaymentsList = [];
+    let hsdTotal = 0;
+
+    const HSD_DATA_PATH = path.join(__dirname, '../data/hsd_purchase.json');
 
     try {
         const banksMaster = JSON.parse(fs.readFileSync(MASTER_DATA_PATH, 'utf8'));
@@ -57,6 +61,27 @@ router.get('/', (req, res) => {
             }
         }
 
+        // HSD Data for right column
+        if (fs.existsSync(HSD_DATA_PATH)) {
+            const hsdData = JSON.parse(fs.readFileSync(HSD_DATA_PATH, 'utf8'));
+            const record = hsdData.find(r => r.date === positionDate);
+            const HSD_ORDER = ["IOC", "BPC", "HPC", "Retail", "Ramnad", "CNG"];
+            const HSD_DISPLAY_NAMES = {
+                "IOC": "IOC",
+                "BPC": "BPC",
+                "HPC": "HPC",
+                "Retail": "Retail / Confed",
+                "Ramnad": "Ramnad",
+                "CNG": "CNG"
+            };
+
+            hsdPaymentsList = HSD_ORDER.map(key => {
+                const amount = record ? (record[key] || 0) : 0;
+                hsdTotal += amount;
+                return { name: HSD_DISPLAY_NAMES[key], amount };
+            });
+        }
+
         // Expense Data
         if (fs.existsSync(PAYMENTS_PATH)) {
             const payments = JSON.parse(fs.readFileSync(PAYMENTS_PATH, 'utf8'));
@@ -77,7 +102,6 @@ router.get('/', (req, res) => {
                     } else {
                         expenseInfo.otherExp += p.amount;
                         // For Other Payments, we want to keep them in order of appearance
-                        // But also group by sub-category if there are duplicates (though typically there aren't in entry)
                         const existing = otherPaymentsList.find(item => item.subCategory === p.subCategory);
                         if (existing) {
                             existing.amount += p.amount;
@@ -104,7 +128,9 @@ router.get('/', (req, res) => {
         totalBankBalance,
         collectionInfo,
         expenseInfo,
-        otherPaymentsList
+        otherPaymentsList,
+        hsdPaymentsList,
+        hsdTotal
     });
 });
 
