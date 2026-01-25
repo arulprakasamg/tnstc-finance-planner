@@ -100,18 +100,29 @@
         document.getElementById('hsdForm').onsubmit = async (e) => {
             e.preventDefault();
             const date = document.getElementById('hsdDate').value;
-            const companies = {};
-            let hasValue = false;
-            document.querySelectorAll('.comp-input').forEach(input => {
-                const val = Number(input.value) || 0;
-                companies[input.name] = val;
-                if (val > 0) hasValue = true;
-            });
+            
+            const iocVal = Number(document.querySelector('input[name="IOC"]').value) || 0;
+            const bpcVal = Number(document.querySelector('input[name="BPC"]').value) || 0;
+            const hpcVal = Number(document.querySelector('input[name="HPC"]').value) || 0;
+            const retailVal = Number(document.querySelector('input[name="Retail"]').value) || 0;
+            const ramnadVal = Number(document.querySelector('input[name="Ramnad"]').value) || 0;
+            const cngVal = Number(document.querySelector('input[name="CNG"]').value) || 0;
 
-            if (!hasValue) {
+            const hasAmount = (iocVal > 0 || bpcVal > 0 || hpcVal > 0 || retailVal > 0 || ramnadVal > 0 || cngVal > 0);
+
+            if (!hasAmount) {
                 alert('Please enter at least one amount');
                 return;
             }
+
+            const companies = {
+                IOC: iocVal,
+                BPC: bpcVal,
+                HPC: hpcVal,
+                Retail: retailVal,
+                Ramnad: ramnadVal,
+                CNG: cngVal
+            };
 
             try {
                 const res = await fetch('/hsd/save', {
