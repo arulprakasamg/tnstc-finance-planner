@@ -57,6 +57,9 @@ router.get('/', (req, res) => {
             totalBankBalance += balance;
             return { name, balance };
         });
+        
+        console.log(`Financial Report Bank Data for ${positionDate}:`, JSON.stringify(bankData));
+        if (bankData.length === 0) console.warn('Financial Report: Bank data array is empty!');
 
         // Collection Data
         if (fs.existsSync(COLLECTIONS_PATH)) {
