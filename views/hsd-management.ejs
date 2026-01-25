@@ -96,8 +96,6 @@
                             <th>Ramnad</th>
                             <th>CNG</th>
                             <th>Total</th>
-                            <th>Paid</th>
-                            <th>Balance</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
@@ -112,8 +110,6 @@
                                 <td><%= (r.Ramnad || 0).toFixed(2) %></td>
                                 <td><%= (r.CNG || 0).toFixed(2) %></td>
                                 <td style="font-weight: bold;">₹<%= (r.total || 0).toFixed(2) %></td>
-                                <td>₹0.00</td>
-                                <td>₹<%= (r.total || 0).toFixed(2) %></td>
                                 <td>
                                     <button class="action-btn btn-edit" onclick="editEntry('<%= r.date %>', <%= JSON.stringify(r) %>)">Edit</button>
                                     <button class="action-btn btn-delete" onclick="deleteEntry('<%= r.date %>')">Delete</button>
@@ -130,8 +126,6 @@
                             <td><%= summary.companyWise.Retail.toFixed(2) %></td>
                             <td><%= summary.companyWise.Ramnad.toFixed(2) %></td>
                             <td><%= summary.companyWise.CNG.toFixed(2) %></td>
-                            <td>₹<%= summary.totalOutstanding.toFixed(2) %></td>
-                            <td>₹0.00</td>
                             <td>₹<%= summary.totalOutstanding.toFixed(2) %></td>
                             <td></td>
                         </tr>
