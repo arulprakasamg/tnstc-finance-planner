@@ -121,6 +121,21 @@
                             </tr>
                         <% }) %>
                     </tbody>
+                    <tfoot style="background: #f8f9fa; font-weight: bold; border-top: 2px solid #dee2e6;">
+                        <tr>
+                            <td>Total</td>
+                            <td><%= summary.companyWise.Retail.toFixed(2) %></td>
+                            <td><%= summary.companyWise.HPC.toFixed(2) %></td>
+                            <td><%= summary.companyWise.BPC.toFixed(2) %></td>
+                            <td><%= summary.companyWise.IOC.toFixed(2) %></td>
+                            <td><%= summary.companyWise.Ramnad.toFixed(2) %></td>
+                            <td><%= summary.companyWise.CNG.toFixed(2) %></td>
+                            <td>₹<%= summary.totalOutstanding.toFixed(2) %></td>
+                            <td>₹0.00</td>
+                            <td>₹<%= summary.totalOutstanding.toFixed(2) %></td>
+                            <td></td>
+                        </tr>
+                    </tfoot>
                 </table>
             </div>
         </main>
