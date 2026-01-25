@@ -22,6 +22,18 @@
         .horizontal-table td:first-child { background: #f8fafc; color: #1a3c5e; font-weight: 700; text-align: left; width: 150px; }
         
         .grand-total { text-align: right; font-size: 1.2rem; font-weight: 800; color: #1a3c5e; margin-top: 1rem; }
+
+        .split-section { display: grid; grid-template-columns: 1fr 1fr; border: 2px solid #1a3c5e; background: white; margin-top: 1.5rem; }
+        .split-col { padding: 1.5rem; }
+        .split-col:first-child { border-right: 2px solid #1a3c5e; }
+        .split-header { font-weight: 800; text-align: center; border-bottom: 2px solid #1a3c5e; margin: -1.5rem -1.5rem 1.5rem -1.5rem; padding: 0.8rem; background: #f8fafc; color: #1a3c5e; }
+        
+        .data-row { display: flex; justify-content: space-between; margin-bottom: 0.8rem; font-size: 0.95rem; }
+        .data-row .label { color: #1e293b; }
+        .data-row .value { font-weight: 700; color: #1a3c5e; }
+        .data-row.highlight { margin-top: 1.5rem; border-top: 1px solid #e2e8f0; padding-top: 1rem; }
+        .data-row.highlight .value { font-size: 1.1rem; color: #1a3c5e; }
+        .data-row.balance-row { border-top: 2px solid #1a3c5e; margin-top: 1rem; padding-top: 1rem; }
     </style>
 </head>
 <body>
@@ -76,6 +88,67 @@
                 </table>
                 <div class="grand-total">
                     Total : <%= (totalBankBalance / 10000000).toFixed(2) %>
+                </div>
+            </section>
+
+            <!-- Collection vs Expenses Section -->
+            <section class="report-section">
+                <div class="section-title">
+                    COLLECTION / EXPENSES
+                    <span>(Rs. in Lakhs)</span>
+                </div>
+                <div class="split-section">
+                    <div class="split-col">
+                        <div class="split-header">COLLECTION</div>
+                        <div class="data-row" style="margin-bottom: 2rem;">
+                            <span class="label">Collection Date :</span>
+                            <span class="value"><%= collectionInfo ? collectionInfo.toDate : '-' %></span>
+                        </div>
+                        
+                        <div class="data-row">
+                            <span class="label">Collection</span>
+                            <span class="value"><%= collectionInfo ? (collectionInfo.grossCollection / 100000).toFixed(2) : '0.00' %></span>
+                        </div>
+                        <div class="data-row">
+                            <span class="label">Less Batta 11%</span>
+                            <span class="value"><%= collectionInfo ? (collectionInfo.batta / 100000).toFixed(2) : '0.00' %></span>
+                        </div>
+                        <div class="data-row">
+                            <span class="label">Less POS</span>
+                            <span class="value"><%= collectionInfo ? (collectionInfo.posCharges / 100000).toFixed(2) : '0.00' %></span>
+                        </div>
+                        
+                        <div class="data-row highlight">
+                            <span class="label">Net Collection</span>
+                            <span class="value"><%= collectionInfo ? (collectionInfo.netCollection / 100000).toFixed(2) : '0.00' %></span>
+                        </div>
+                    </div>
+                    
+                    <div class="split-col">
+                        <div class="split-header">EXPENSES</div>
+                        <div class="data-row">
+                            <span class="label">NET</span>
+                            <span class="value"><%= collectionInfo ? (collectionInfo.netCollection / 100000).toFixed(2) : '0.00' %></span>
+                        </div>
+                        <div class="data-row">
+                            <span class="label">Oil Exp</span>
+                            <span class="value"><%= (expenseInfo.oilExp / 100000).toFixed(2) %></span>
+                        </div>
+                        <div class="data-row">
+                            <span class="label">Other Exp</span>
+                            <span class="value"><%= (expenseInfo.otherExp / 100000).toFixed(2) %></span>
+                        </div>
+                        
+                        <div class="data-row highlight">
+                            <span class="label">Total Exp</span>
+                            <span class="value"><%= (expenseInfo.totalExp / 100000).toFixed(2) %></span>
+                        </div>
+                        
+                        <div class="data-row balance-row">
+                            <span class="label">Balance</span>
+                            <span class="value"><%= (expenseInfo.balance / 100000).toFixed(2) %></span>
+                        </div>
+                    </div>
                 </div>
             </section>
         </main>

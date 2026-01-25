@@ -19,8 +19,18 @@ router.get('/', (req, res) => {
         "IOB – 142300"
     ];
 
+    const COLLECTIONS_PATH = path.join(__dirname, '../data/daily_collections.json');
+    const PAYMENTS_PATH = path.join(__dirname, '../data/planned_payments.json');
+
     let bankData = [];
     let totalBankBalance = 0;
+    let collectionInfo = null;
+    let expenseInfo = {
+        oilExp: 0,
+        otherExp: 0,
+        totalExp: 0,
+        balance: 0
+    };
 
     try {
         const banksMaster = JSON.parse(fs.readFileSync(MASTER_DATA_PATH, 'utf8'));
@@ -37,15 +47,46 @@ router.get('/', (req, res) => {
             totalBankBalance += balance;
             return { name, balance };
         });
+
+        // Collection Data
+        if (fs.existsSync(COLLECTIONS_PATH)) {
+            const collections = JSON.parse(fs.readFileSync(COLLECTIONS_PATH, 'utf8'));
+            if (collections[positionDate]) {
+                collectionInfo = collections[positionDate];
+            }
+        }
+
+        // Expense Data
+        if (fs.existsSync(PAYMENTS_PATH)) {
+            const payments = JSON.parse(fs.readFileSync(PAYMENTS_PATH, 'utf8'));
+            if (payments[positionDate]) {
+                const dayPayments = payments[positionDate];
+                Object.keys(dayPayments).forEach(bankId => {
+                    dayPayments[bankId].forEach(p => {
+                        if (p.category === 'Oil Companies') {
+                            expenseInfo.oilExp += p.amount;
+                        } else {
+                            expenseInfo.otherExp += p.amount;
+                        }
+                    });
+                });
+                expenseInfo.totalExp = expenseInfo.oilExp + expenseInfo.otherExp;
+                if (collectionInfo) {
+                    expenseInfo.balance = collectionInfo.netCollection - expenseInfo.totalExp;
+                }
+            }
+        }
     } catch (err) {
-        console.error('Financial Report Bank Error:', err);
+        console.error('Financial Report Data Error:', err);
     }
 
     res.render('financial-report', { 
         today, 
         positionDate, 
         bankData, 
-        totalBankBalance 
+        totalBankBalance,
+        collectionInfo,
+        expenseInfo
     });
 });
 
