@@ -46,10 +46,12 @@ router.get('/', (req, res) => {
         const dailyBalances = JSON.parse(fs.readFileSync(BALANCES_DATA_PATH, 'utf8'));
         const availableDates = Object.keys(dailyBalances).sort();
 
+        // Sync bank balance logic with Dashboard API in index.js
         bankData = BANK_ORDER.map(name => {
             const master = banksMaster.find(b => b.bankName === name);
             let balance = 0;
             if (master) {
+                // Find the latest balance on or before the selected Position Date
                 const effectiveDate = availableDates.slice().reverse().find(d => d <= positionDate && dailyBalances[d][master.id] !== undefined);
                 if (effectiveDate) balance = dailyBalances[effectiveDate][master.id];
             }
