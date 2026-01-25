@@ -103,7 +103,7 @@
             const companies = {};
             let hasValue = false;
             document.querySelectorAll('.comp-input').forEach(input => {
-                const val = parseFloat(input.value) || 0;
+                const val = Number(input.value) || 0;
                 companies[input.name] = val;
                 if (val > 0) hasValue = true;
             });
