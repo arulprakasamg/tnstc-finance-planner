@@ -26,14 +26,36 @@ const formatDate = (dateStr) => {
 router.get('/', (req, res) => {
     const data = getHsdData();
     const sortedDates = Object.keys(data).sort();
-    const records = sortedDates.map(date => ({
-        date,
-        formattedDate: formatDate(date),
-        ...data[date],
-        total: Object.values(data[date]).reduce((sum, val) => sum + (parseFloat(val) || 0), 0)
-    }));
     
-    res.render('hsd-management', { records, today: new Date().toISOString().split('T')[0] });
+    // Summary Aggregations
+    const summary = {
+        totalOutstanding: 0,
+        companyWise: {
+            IOC: 0, BPC: 0, HPC: 0, Retail: 0, Ramnad: 0, CNG: 0
+        }
+    };
+
+    const records = sortedDates.map(date => {
+        const entry = data[date];
+        const rowTotal = Object.values(entry).reduce((sum, val) => sum + (parseFloat(val) || 0), 0);
+        
+        // Add to summary
+        Object.keys(summary.companyWise).forEach(co => {
+            summary.companyWise[co] += (parseFloat(entry[co]) || 0);
+        });
+        summary.totalOutstanding += rowTotal;
+
+        return {
+            date,
+            formattedDate: formatDate(date),
+            ...entry,
+            total: rowTotal,
+            paid: 0,
+            balance: rowTotal
+        };
+    });
+    
+    res.render('hsd-management', { records, summary, today: new Date().toISOString().split('T')[0] });
 });
 
 router.post('/save', (req, res) => {

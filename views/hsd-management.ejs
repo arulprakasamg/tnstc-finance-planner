@@ -6,6 +6,13 @@
     <title>HSD Management - TNSTC Finance Planner</title>
     <link rel="stylesheet" href="/css/style.css">
     <style>
+        .summary-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
+        .summary-card { background: white; padding: 1.5rem; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border-left: 5px solid #1a3c5e; }
+        .summary-card h3 { font-size: 0.9rem; color: #64748b; margin-bottom: 1rem; text-transform: uppercase; letter-spacing: 0.5px; }
+        .summary-card .main-value { font-size: 1.8rem; font-weight: 700; color: #1a3c5e; margin-bottom: 0.5rem; }
+        .company-list { display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; }
+        .company-item { display: flex; justify-content: space-between; font-size: 0.85rem; color: #1e293b; border-bottom: 1px solid #f1f5f9; padding-bottom: 0.3rem; }
+        .company-item span:last-child { font-weight: 600; color: #1a3c5e; }
         .hsd-container { background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
         .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
         .input-group { display: flex; flex-direction: column; gap: 0.5rem; }
@@ -38,6 +45,27 @@
             <p class="date-range">Capture Daily HSD Purchases</p>
         </header>
         <main class="container">
+            <!-- 1. Summary Cards -->
+            <div class="summary-cards">
+                <div class="summary-card">
+                    <h3>Total HSD Outstanding</h3>
+                    <div class="main-value">₹<%= summary.totalOutstanding.toFixed(2) %></div>
+                    <p style="font-size: 0.8rem; color: #64748b;">Grand total across all companies</p>
+                </div>
+                <div class="summary-card">
+                    <h3>Oil Company-wise Outstanding</h3>
+                    <div class="company-list">
+                        <div class="company-item"><span>IOC</span> <span>₹<%= summary.companyWise.IOC.toFixed(2) %></span></div>
+                        <div class="company-item"><span>BPC</span> <span>₹<%= summary.companyWise.BPC.toFixed(2) %></span></div>
+                        <div class="company-item"><span>HPC</span> <span>₹<%= summary.companyWise.HPC.toFixed(2) %></span></div>
+                        <div class="company-item"><span>Retail / Confed</span> <span>₹<%= summary.companyWise.Retail.toFixed(2) %></span></div>
+                        <div class="company-item"><span>Ramnad</span> <span>₹<%= summary.companyWise.Ramnad.toFixed(2) %></span></div>
+                        <div class="company-item"><span>CNG</span> <span>₹<%= summary.companyWise.CNG.toFixed(2) %></span></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. HSD Purchase Entry Section -->
             <div class="hsd-container">
                 <form id="hsdForm">
                     <div class="input-group" style="margin-bottom: 2rem; max-width: 300px;">
