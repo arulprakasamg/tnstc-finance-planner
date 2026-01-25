@@ -96,14 +96,22 @@
         </main>
     </div>
 
-    <script>
         document.getElementById('hsdForm').onsubmit = async (e) => {
             e.preventDefault();
             const date = document.getElementById('hsdDate').value;
             const companies = {};
+            let hasValue = false;
+            
             document.querySelectorAll('.comp-input').forEach(input => {
-                companies[input.name] = input.value;
+                const val = parseFloat(input.value) || 0;
+                companies[input.name] = val;
+                if (val > 0) hasValue = true;
             });
+
+            if (!hasValue) {
+                alert('Please enter at least one amount');
+                return;
+            }
 
             try {
                 const res = await fetch('/hsd/save', {
@@ -112,7 +120,10 @@
                     body: JSON.stringify({ date, companies })
                 });
                 if (res.ok) window.location.reload();
-                else alert('Please enter at least one amount');
+                else {
+                    const errData = await res.json();
+                    alert(errData.error || 'Error saving entry');
+                }
             } catch (err) { alert('Error saving entry'); }
         };
 
