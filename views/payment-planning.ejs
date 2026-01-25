@@ -91,7 +91,7 @@
                         <div class="category-block" data-category="Employee Related Payment 1 (Own Fund)">
                             <div class="category-header">
                                 <h3>3. Employee Related Payment 1 (Own Fund)</h3>
-                                <span class="category-total" id="total-Employee-Related-Payment-1-(Own-Fund)">₹0.00</span>
+                                <span class="category-total" id="total-Employee-Related-Payment-1--Own-Fund-">₹0.00</span>
                             </div>
                             <div class="sub-category"><span>Officer TA-Bill</span><input type="number" data-cat="Employee Related Payment 1 (Own Fund)" data-sub="Officer TA-Bill" step="0.01" min="0"></div>
                             <div class="sub-category"><span>Act Apprentice Salary</span><input type="number" data-cat="Employee Related Payment 1 (Own Fund)" data-sub="Act Apprentice Salary" step="0.01" min="0"></div>
@@ -106,7 +106,7 @@
                         <div class="category-block" data-category="Employee Related Payment 2 (TDFC / Govt Fund)">
                             <div class="category-header">
                                 <h3>4. Employee Related Payment 2 (TDFC / Govt Fund)</h3>
-                                <span class="category-total" id="total-Employee-Related-Payment-2-(TDFC-/-Govt-Fund)">₹0.00</span>
+                                <span class="category-total" id="total-Employee-Related-Payment-2--TDFC---Govt-Fund-">₹0.00</span>
                             </div>
                             <div class="sub-category"><span>Salary</span><input type="number" data-cat="Employee Related Payment 2 (TDFC / Govt Fund)" data-sub="Salary" step="0.01" min="0"></div>
                             <div class="sub-category"><span>Bonus</span><input type="number" data-cat="Employee Related Payment 2 (TDFC / Govt Fund)" data-sub="Bonus" step="0.01" min="0"></div>
@@ -242,7 +242,8 @@
 
             // Update category running totals
             Object.keys(categoryTotals).forEach(cat => {
-                const safeId = 'total-' + cat.replace(/ /g, '-').replace(/\//g, '-').replace(/\(/g, '-').replace(/\)/g, '-');
+                // Remove all special characters to create a safe ID
+                const safeId = 'total-' + cat.replace(/[^a-zA-Z0-9]/g, '-');
                 const el = document.getElementById(safeId);
                 if (el) {
                     el.innerText = '₹' + categoryTotals[cat].toLocaleString('en-IN', { minimumFractionDigits: 2 });
