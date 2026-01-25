@@ -57,18 +57,25 @@ router.get('/', (req, res) => {
     
     // Calculate collection for date range
     const collectionsDataPath = path.join(__dirname, '../data/daily_collections.json');
-    let totalCollection = 0;
+    let totalNetCollection = 0;
+    let totalGrossCollection = 0;
+    let totalBatta = 0;
+    let totalPos = 0;
+
     try {
         if (fs.existsSync(collectionsDataPath)) {
             const collections = JSON.parse(fs.readFileSync(collectionsDataPath, 'utf8'));
             const start = new Date(fromDate);
             const end = new Date(toDate);
             
-            // Loop through dates in range and sum Net Collection
+            // Loop through dates in range and sum collection components
             for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
                 const dateStr = d.toISOString().split('T')[0];
                 if (collections[dateStr]) {
-                    totalCollection += collections[dateStr].netCollection || 0;
+                    totalNetCollection += collections[dateStr].netCollection || 0;
+                    totalGrossCollection += collections[dateStr].grossCollection || 0;
+                    totalBatta += collections[dateStr].battaAmount || 0;
+                    totalPos += collections[dateStr].posAmount || 0;
                 }
             }
         }
@@ -101,7 +108,10 @@ router.get('/', (req, res) => {
     const data = {
         bankBalance: totalLiveBankBalance,
         bankBreakdown: liveBankBreakdown,
-        collection: totalCollection,
+        collection: totalNetCollection,
+        collectionGross: totalGrossCollection,
+        collectionBatta: totalBatta,
+        collectionPos: totalPos,
         hsdOutstanding: hsdTotal,
         hsdBreakdown: hsdCompanyWise,
         fromDate,

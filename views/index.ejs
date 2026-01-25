@@ -73,7 +73,7 @@
             <div class="card card-collection">
                 <div class="card-main">
                     <h3>Collection</h3>
-                    <p class="amount">₹<%= data.collection.toLocaleString('en-IN', { minimumFractionDigits: 2 }) %></p>
+                    <p class="amount">₹<%= data.collectionGross.toLocaleString('en-IN', { minimumFractionDigits: 2 }) %></p>
                     <p class="card-date-info">
                         <% if (data.fromDate === data.toDate) { %>
                             <%= formatDate(data.fromDate) %>
@@ -81,6 +81,17 @@
                             <%= formatDate(data.fromDate) %> – <%= formatDate(data.toDate) %>
                         <% } %>
                     </p>
+                </div>
+                <div class="card-breakdown">
+                    <ul class="bank-list">
+                        <li><span class="bank-name">Gross</span> <span class="bank-value">₹<%= data.collectionGross.toLocaleString('en-IN', { minimumFractionDigits: 2 }) %></span></li>
+                        <li><span class="bank-name">Less 11%</span> <span class="bank-value">₹<%= data.collectionBatta.toLocaleString('en-IN', { minimumFractionDigits: 2 }) %></span></li>
+                        <li><span class="bank-name">POS</span> <span class="bank-value">₹<%= data.collectionPos.toLocaleString('en-IN', { minimumFractionDigits: 2 }) %></span></li>
+                        <li style="border-top: 1px solid rgba(255,255,255,0.2); margin-top: 5px; padding-top: 5px;">
+                            <span class="bank-name" style="font-weight: 800;">Net Collection</span> 
+                            <span class="bank-value" style="font-weight: 800;">₹<%= data.collection.toLocaleString('en-IN', { minimumFractionDigits: 2 }) %></span>
+                        </li>
+                    </ul>
                 </div>
             </div>
 
