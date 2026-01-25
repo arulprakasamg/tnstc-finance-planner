@@ -176,13 +176,19 @@
         async function deleteEntry(date) {
             if (!confirm('Delete this entry?')) return;
             try {
-                const res = await fetch('/hsd/delete', {
+                const res = await fetch('/hsd-management/delete', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ date })
                 });
-                if (res.ok) window.location.reload();
-            } catch (err) { alert('Error deleting entry'); }
+                if (res.ok) {
+                    window.location.reload();
+                } else {
+                    alert('Error deleting entry');
+                }
+            } catch (err) { 
+                alert('Error deleting entry'); 
+            }
         }
     </script>
 </body>
