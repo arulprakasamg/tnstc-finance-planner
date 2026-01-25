@@ -51,11 +51,16 @@ router.post('/save', (req, res) => {
     }
     
     if (hasValue) {
+        // Special case: field name in UI is "Retail" but table column is "Retail"
+        // The data-cat in payment planning used "Retail / Confed"
+        // Let's ensure we map the keys correctly if needed, but for now 
+        // the form sends names like "IOC", "BPC", "HPC", "Retail", "Ramnad", "CNG"
+        // and the table expects these keys.
         data[date] = entry;
         saveHsdData(data);
         res.json({ success: true });
     } else {
-        res.status(400).json({ error: 'Enter at least one amount' });
+        res.status(400).json({ error: 'Please enter at least one amount' });
     }
 });
 
