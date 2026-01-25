@@ -76,11 +76,34 @@ router.get('/', (req, res) => {
         console.error('Error reading collections for dashboard:', err);
     }
 
+    // Calculate HSD Outstanding
+    const hsdDataPath = path.join(__dirname, '../data/hsd_purchase.json');
+    let hsdTotal = 0;
+    const hsdCompanyWise = {
+        IOC: 0, BPC: 0, HPC: 0, Retail: 0, Ramnad: 0, CNG: 0
+    };
+    
+    try {
+        if (fs.existsSync(hsdDataPath)) {
+            const hsdData = JSON.parse(fs.readFileSync(hsdDataPath, 'utf8'));
+            Object.values(hsdData).forEach(entry => {
+                Object.keys(hsdCompanyWise).forEach(co => {
+                    const val = parseFloat(entry[co]) || 0;
+                    hsdCompanyWise[co] += val;
+                    hsdTotal += val;
+                });
+            });
+        }
+    } catch (err) {
+        console.error('Error reading HSD data for dashboard:', err);
+    }
+
     const data = {
         bankBalance: totalLiveBankBalance,
         bankBreakdown: liveBankBreakdown,
         collection: totalCollection,
-        hsdOutstanding: dashboardMetrics.hsdOutstanding,
+        hsdOutstanding: hsdTotal,
+        hsdBreakdown: hsdCompanyWise,
         fromDate,
         toDate
     };

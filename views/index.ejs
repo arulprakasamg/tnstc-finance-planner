@@ -90,6 +90,16 @@
                     <h3>HSD Outstanding</h3>
                     <p class="amount">₹<%= data.hsdOutstanding.toLocaleString('en-IN', { minimumFractionDigits: 2 }) %></p>
                 </div>
+                <div class="card-breakdown">
+                    <ul class="bank-list">
+                        <li><span class="bank-name">IOC</span> <span class="bank-value">₹<%= data.hsdBreakdown.IOC.toLocaleString('en-IN', { minimumFractionDigits: 2 }) %></span></li>
+                        <li><span class="bank-name">BPC</span> <span class="bank-value">₹<%= data.hsdBreakdown.BPC.toLocaleString('en-IN', { minimumFractionDigits: 2 }) %></span></li>
+                        <li><span class="bank-name">HPC</span> <span class="bank-value">₹<%= data.hsdBreakdown.HPC.toLocaleString('en-IN', { minimumFractionDigits: 2 }) %></span></li>
+                        <li><span class="bank-name">Retail / Confed</span> <span class="bank-value">₹<%= data.hsdBreakdown.Retail.toLocaleString('en-IN', { minimumFractionDigits: 2 }) %></span></li>
+                        <li><span class="bank-name">Ramnad</span> <span class="bank-value">₹<%= data.hsdBreakdown.Ramnad.toLocaleString('en-IN', { minimumFractionDigits: 2 }) %></span></li>
+                        <li><span class="bank-name">CNG</span> <span class="bank-value">₹<%= data.hsdBreakdown.CNG.toLocaleString('en-IN', { minimumFractionDigits: 2 }) %></span></li>
+                    </ul>
+                </div>
             </div>
         </section>
     </main>
