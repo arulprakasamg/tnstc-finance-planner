@@ -151,6 +151,45 @@
                     </div>
                 </div>
             </section>
+            <!-- Other Payments Detail Section -->
+            <section class="report-section">
+                <div class="section-title">
+                    OTHER PAYMENTS
+                    <span>(Rs. in Lakhs)</span>
+                </div>
+                <div class="horizontal-table-container">
+                    <table class="horizontal-table" style="text-align: left;">
+                        <thead>
+                            <tr>
+                                <th>Category / Description</th>
+                                <th style="text-align: right;">Amount (Lakhs)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% if (otherPaymentsList.length > 0) { %>
+                                <% otherPaymentsList.forEach(item => { %>
+                                    <tr>
+                                        <td style="text-align: left;"><%= item.subCategory %></td>
+                                        <td style="text-align: right;"><%= (item.amount / 100000).toFixed(2) %></td>
+                                    </tr>
+                                <% }) %>
+                            <% } else { %>
+                                <tr>
+                                    <td colspan="2" style="text-align: center; color: #64748b; font-style: italic;">No Other Payments</td>
+                                </tr>
+                            <% } %>
+                        </tbody>
+                        <% if (otherPaymentsList.length > 0) { %>
+                        <tfoot>
+                            <tr style="font-weight: 800; background: #f8fafc;">
+                                <td style="text-align: right;">Total :</td>
+                                <td style="text-align: right;"><%= (expenseInfo.otherExp / 100000).toFixed(2) %></td>
+                            </tr>
+                        </tfoot>
+                        <% } %>
+                    </table>
+                </div>
+            </section>
         </main>
     </div>
 </body>

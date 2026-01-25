@@ -31,6 +31,7 @@ router.get('/', (req, res) => {
         totalExp: 0,
         balance: 0
     };
+    let otherPaymentsList = [];
 
     try {
         const banksMaster = JSON.parse(fs.readFileSync(MASTER_DATA_PATH, 'utf8'));
@@ -61,15 +62,31 @@ router.get('/', (req, res) => {
             const payments = JSON.parse(fs.readFileSync(PAYMENTS_PATH, 'utf8'));
             if (payments[positionDate]) {
                 const dayPayments = payments[positionDate];
+                
+                // Get all payments across all banks for this day
+                const allPayments = [];
                 Object.keys(dayPayments).forEach(bankId => {
                     dayPayments[bankId].forEach(p => {
-                        if (p.category === 'Oil Companies') {
-                            expenseInfo.oilExp += p.amount;
-                        } else {
-                            expenseInfo.otherExp += p.amount;
-                        }
+                        allPayments.push(p);
                     });
                 });
+
+                allPayments.forEach(p => {
+                    if (p.category === 'Oil Companies') {
+                        expenseInfo.oilExp += p.amount;
+                    } else {
+                        expenseInfo.otherExp += p.amount;
+                        // For Other Payments, we want to keep them in order of appearance
+                        // But also group by sub-category if there are duplicates (though typically there aren't in entry)
+                        const existing = otherPaymentsList.find(item => item.subCategory === p.subCategory);
+                        if (existing) {
+                            existing.amount += p.amount;
+                        } else {
+                            otherPaymentsList.push({ subCategory: p.subCategory, amount: p.amount });
+                        }
+                    }
+                });
+                
                 expenseInfo.totalExp = expenseInfo.oilExp + expenseInfo.otherExp;
                 if (collectionInfo) {
                     expenseInfo.balance = collectionInfo.netCollection - expenseInfo.totalExp;
@@ -86,7 +103,8 @@ router.get('/', (req, res) => {
         bankData, 
         totalBankBalance,
         collectionInfo,
-        expenseInfo
+        expenseInfo,
+        otherPaymentsList
     });
 });
 
