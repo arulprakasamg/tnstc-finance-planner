@@ -3,7 +3,7 @@ const router = express.Router();
 const fs = require('fs');
 const path = require('path');
 
-/* ---------- SAFE READ HELPERS ---------- */
+/* ---------- SAFE READ ---------- */
 function readJSON(filePath, fallback) {
   try {
     if (!fs.existsSync(filePath)) return fallback;
@@ -15,17 +15,20 @@ function readJSON(filePath, fallback) {
 
 /* ---------- ROUTE ---------- */
 router.get('/', (req, res) => {
-  const today = new Date().toISOString().split('T')[0];
+
+  // BACKEND USES dd/mm/yyyy ONLY
+  const today = new Date().toLocaleDateString('en-GB');
   const positionDate = req.query.positionDate || today;
 
   try {
     /* FILE PATHS */
-    const BANK_FILE = path.join(__dirname, '../data/bank_balances_daily.json');
+    const BANK_BAL_FILE = path.join(__dirname, '../data/bank_balances_daily.json');
+    const BANK_MASTER_FILE = path.join(__dirname, '../data/bank_master.json');
     const COLLECTION_FILE = path.join(__dirname, '../data/daily_collections.json');
     const PAYMENT_FILE = path.join(__dirname, '../data/planned_payments.json');
     const HSD_FILE = path.join(__dirname, '../data/hsd_purchase.json');
 
-    /* BANK ORDER (must match Bank Master names) */
+    /* BANK ORDER (DISPLAY ORDER) */
     const BANK_ORDER = [
       'SBI – PLATINUM',
       'IOB – 5555',
@@ -34,14 +37,24 @@ router.get('/', (req, res) => {
       'IOB – 142300'
     ];
 
+    /* ---------- BANK MASTER MAP ---------- */
+    const bankMaster = readJSON(BANK_MASTER_FILE, []);
+    const bankNameToId = {};
+
+    bankMaster.forEach(b => {
+      const displayName = `${b.bankName}`;
+      bankNameToId[displayName] = b.id;
+    });
+
     /* ---------- BANK BALANCES ---------- */
-    const bankRaw = readJSON(BANK_FILE, {});
+    const bankRaw = readJSON(BANK_BAL_FILE, {});
     const bankToday = bankRaw[positionDate] || {};
 
     let totalBankBalance = 0;
 
     const bankData = BANK_ORDER.map(name => {
-      const balance = Number(bankToday[name] || 0);
+      const bankId = bankNameToId[name];
+      const balance = bankId ? Number(bankToday[bankId] || 0) : 0;
       totalBankBalance += balance;
       return { name, balance };
     });
@@ -92,6 +105,10 @@ router.get('/', (req, res) => {
     /* ---------- HSD OUTSTANDING ---------- */
     const hsdRaw = readJSON(HSD_FILE, []);
 
+    const hsdArray = Array.isArray(hsdRaw)
+      ? hsdRaw
+      : Object.keys(hsdRaw || {}).map(date => ({ date, ...hsdRaw[date] }));
+
     const hsdOutstandingHistory = [];
     const hsdGrandTotals = {
       IOC: 0,
@@ -103,7 +120,7 @@ router.get('/', (req, res) => {
       Total: 0
     };
 
-    hsdRaw.forEach(r => {
+    hsdArray.forEach(r => {
       const row = {
         formattedDate: r.date || '',
         IOC: Number(r.IOC || 0),
@@ -115,12 +132,8 @@ router.get('/', (req, res) => {
       };
 
       row.total =
-        row.IOC +
-        row.BPC +
-        row.HPC +
-        row.Retail +
-        row.Ramnad +
-        row.CNG;
+        row.IOC + row.BPC + row.HPC +
+        row.Retail + row.Ramnad + row.CNG;
 
       hsdOutstandingHistory.push(row);
 

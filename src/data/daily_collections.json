@@ -1,29 +1,11 @@
 {
-  "2026-01-24": {
-    "fromDate": "2026-01-23",
-    "toDate": "2026-01-23",
-    "grossCollection": 300,
-    "batta": 33,
-    "posCharges": 75,
-    "netCollection": 192,
-    "updatedAt": "2026-01-24T15:35:25.297Z"
-  },
-  "2026-01-25": {
-    "fromDate": "2026-01-24",
-    "toDate": "2026-01-24",
-    "grossCollection": 400,
-    "batta": 44,
-    "posCharges": 80,
-    "netCollection": 276,
-    "updatedAt": "2026-01-25T06:25:39.143Z"
-  },
-  "2026-01-26": {
-    "fromDate": "2026-01-25",
-    "toDate": "2026-01-25",
-    "grossCollection": 500,
-    "batta": 55,
-    "posCharges": 80,
-    "netCollection": 365,
-    "updatedAt": "2026-01-26T05:17:56.346Z"
+  "25/01/2026": {
+    "fromDate": "24/01/2026",
+    "toDate": "24/01/2026",
+    "grossCollection": 450,
+    "batta": 49.5,
+    "posCharges": 95,
+    "netCollection": 305.5,
+    "updatedAt": "26/01/2026, 11:02:48"
   }
 }

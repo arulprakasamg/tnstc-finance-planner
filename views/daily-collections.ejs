@@ -7,147 +7,195 @@
     <link rel="stylesheet" href="/css/style.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
 </head>
+
 <body>
-    <nav class="sidebar">
-        <div class="sidebar-header">
-            <h2>TNSTC Finance</h2>
+
+<!-- ================= DATE HELPERS (EJS ONLY – NO DESIGN CHANGE) ================= -->
+<%
+function ddmmyyyy_to_yyyymmdd(d) {
+    if (!d || !d.includes('/')) return '';
+    const [dd, mm, yyyy] = d.split('/');
+    return `${yyyy}-${mm}-${dd}`;
+}
+%>
+
+<nav class="sidebar">
+    <div class="sidebar-header">
+        <h2>TNSTC Finance</h2>
+    </div>
+    <ul class="sidebar-menu">
+        <li><a href="/">Dashboard</a></li>
+        <li><a href="/bank-balances">Bank Balances</a></li>
+        <li><a href="/daily-collections" class="active">Daily Collections</a></li>
+        <li><a href="/payment-planning">Payment Planning</a></li>
+        <li><a href="/hsd-management">HSD Management</a></li>
+        <li><a href="/financial-report">Financial Report</a></li>
+    </ul>
+</nav>
+
+<div class="main-content">
+<header>
+    <h1>Daily Collections</h1>
+    <p class="date-range">Maintenance of Daily Revenue Collections</p>
+</header>
+
+<main class="container">
+<section class="collection-entry-section">
+<div class="section-header">
+    <h2>Collection Entry</h2>
+
+    <div class="position-date-control">
+        <label for="posDate">Position Date:</label>
+
+        <!-- FIXED: dd/mm/yyyy → yyyy-mm-dd -->
+        <input type="date"
+               id="posDate"
+               value="<%= ddmmyyyy_to_yyyymmdd(positionDate) %>"
+               onchange="onPositionDateChange(this.value)">
+    </div>
+</div>
+
+<form id="collectionForm" class="collection-form">
+
+    <!-- BACKEND DATE (dd/mm/yyyy stays) -->
+    <input type="hidden" name="positionDate" value="<%= positionDate %>">
+
+    <div class="form-row">
+        <div class="form-group">
+            <label>From Date</label>
+            <input type="date"
+                   name="fromDate"
+                   value="<%= ddmmyyyy_to_yyyymmdd(entry.fromDate) %>"
+                   required>
         </div>
-        <ul class="sidebar-menu">
-            <li><a href="/">Dashboard</a></li>
-            <li><a href="/bank-balances">Bank Balances</a></li>
-            <li><a href="/daily-collections" class="active">Daily Collections</a></li>
-            <li><a href="/payment-planning">Payment Planning</a></li>
-            <li><a href="/hsd-management">HSD Management</a></li>
-            <li><a href="/financial-report">Financial Report</a></li>
-        </ul>
-    </nav>
-    <div class="main-content">
-        <header>
-            <h1>Daily Collections</h1>
-            <p class="date-range">Maintenance of Daily Revenue Collections</p>
-        </header>
-        
-        <main class="container">
-            <section class="collection-entry-section">
-                <div class="section-header">
-                    <h2>Collection Entry</h2>
-                    <div class="position-date-control">
-                        <label for="posDate">Position Date:</label>
-                        <input type="date" id="posDate" value="<%= positionDate %>" onchange="window.location.href='/daily-collections?positionDate='+this.value">
-                    </div>
-                </div>
 
-                <form id="collectionForm" class="collection-form">
-                    <input type="hidden" name="positionDate" value="<%= positionDate %>">
-                    
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>From Date</label>
-                            <input type="date" name="fromDate" value="<%= entry.fromDate %>" required>
-                        </div>
-                        <div class="form-group">
-                            <label>To Date</label>
-                            <input type="date" name="toDate" value="<%= entry.toDate %>" required>
-                        </div>
-                    </div>
-
-                    <div class="form-grid">
-                        <div class="form-group">
-                            <label>Gross Collection (₹) *</label>
-                            <input type="number" name="grossCollection" id="grossCollection" value="<%= entry.grossCollection %>" step="0.01" min="0" required oninput="calculateNet()">
-                        </div>
-                        <div class="form-group">
-                            <label>Batta (11% of Gross) (₹)</label>
-                            <input type="number" name="batta" id="batta" value="<%= entry.batta %>" step="0.01" readonly class="readonly-input">
-                        </div>
-                        <div class="form-group">
-                            <label>POS Charges (₹)</label>
-                            <input type="number" name="posCharges" id="posCharges" value="<%= entry.posCharges %>" step="0.01" min="0" oninput="calculateNet()">
-                        </div>
-                        <div class="form-group">
-                            <label>Net Collection (₹)</label>
-                            <input type="number" name="netCollection" id="netCollection" value="<%= entry.netCollection %>" step="0.01" readonly class="readonly-input highlight-net">
-                        </div>
-                    </div>
-
-                    <div class="form-actions">
-                        <button type="submit" class="btn-primary">Save Collection Entry</button>
-                    </div>
-                </form>
-            </section>
-        </main>
+        <div class="form-group">
+            <label>To Date</label>
+            <input type="date"
+                   name="toDate"
+                   value="<%= ddmmyyyy_to_yyyymmdd(entry.toDate) %>"
+                   required>
+        </div>
     </div>
 
-    <style>
-        .collection-entry-section { background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
-        .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
-        .collection-form { display: flex; flex-direction: column; gap: 1.5rem; }
-        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; }
-        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 2rem; border-top: 1px solid #eee; padding-top: 2rem; }
-        .form-group { display: flex; flex-direction: column; gap: 0.5rem; }
-        .form-group label { font-size: 0.85rem; font-weight: 600; color: #7f8c8d; text-transform: uppercase; }
-        .form-group input { padding: 0.8rem; border: 1px solid #ddd; border-radius: 6px; font-family: inherit; font-size: 1rem; }
-        .readonly-input { background-color: #f9f9f9; cursor: not-allowed; border-color: #eee; }
-        .highlight-net { font-weight: 700; color: #27ae60; background-color: #f0fdf4; border-color: #bbf7d0; }
-        .form-actions { display: flex; justify-content: flex-end; margin-top: 1rem; }
-        .position-date-control { display: flex; align-items: center; gap: 1rem; }
-        .position-date-control label { font-weight: 600; font-size: 0.9rem; color: #1a3c5e; }
-        .position-date-control input { padding: 0.5rem; border: 1px solid #ddd; border-radius: 6px; }
+    <div class="form-grid">
+        <div class="form-group">
+            <label>Gross Collection (₹) *</label>
+            <input type="number" name="grossCollection" id="grossCollection"
+                   value="<%= entry.grossCollection %>"
+                   step="0.01" min="0" required oninput="calculateNet()">
+        </div>
 
-        @media (max-width: 768px) {
-            .form-row, .form-grid { grid-template-columns: 1fr; }
+        <div class="form-group">
+            <label>Batta (11% of Gross) (₹)</label>
+            <input type="number" name="batta" id="batta"
+                   value="<%= entry.batta %>"
+                   step="0.01" readonly class="readonly-input">
+        </div>
+
+        <div class="form-group">
+            <label>POS Charges (₹)</label>
+            <input type="number" name="posCharges" id="posCharges"
+                   value="<%= entry.posCharges %>"
+                   step="0.01" min="0" oninput="calculateNet()">
+        </div>
+
+        <div class="form-group">
+            <label>Net Collection (₹)</label>
+            <input type="number" name="netCollection" id="netCollection"
+                   value="<%= entry.netCollection %>"
+                   step="0.01" readonly class="readonly-input highlight-net">
+        </div>
+    </div>
+
+    <div class="form-actions">
+        <button type="submit" class="btn-primary">Save Collection Entry</button>
+    </div>
+</form>
+</section>
+</main>
+</div>
+
+<!-- ================= NO CSS CHANGES BELOW ================= -->
+<style>
+/* unchanged – exactly your original */
+.collection-entry-section { background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+.section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
+.collection-form { display: flex; flex-direction: column; gap: 1.5rem; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; }
+.form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 2rem; border-top: 1px solid #eee; padding-top: 2rem; }
+.form-group { display: flex; flex-direction: column; gap: 0.5rem; }
+.form-group label { font-size: 0.85rem; font-weight: 600; color: #7f8c8d; text-transform: uppercase; }
+.form-group input { padding: 0.8rem; border: 1px solid #ddd; border-radius: 6px; font-family: inherit; font-size: 1rem; }
+.readonly-input { background-color: #f9f9f9; cursor: not-allowed; border-color: #eee; }
+.highlight-net { font-weight: 700; color: #27ae60; background-color: #f0fdf4; border-color: #bbf7d0; }
+.form-actions { display: flex; justify-content: flex-end; margin-top: 1rem; }
+.position-date-control { display: flex; align-items: center; gap: 1rem; }
+.position-date-control label { font-weight: 600; font-size: 0.9rem; color: #1a3c5e; }
+.position-date-control input { padding: 0.5rem; border: 1px solid #ddd; border-radius: 6px; }
+@media (max-width: 768px) {
+    .form-row, .form-grid { grid-template-columns: 1fr; }
+}
+</style>
+
+<script>
+/* ===== JS DATE HELPERS (FRONTEND ONLY) ===== */
+function yyyymmdd_to_ddmmyyyy(d) {
+    if (!d || !d.includes('-')) return '';
+    const [yyyy, mm, dd] = d.split('-');
+    return `${dd}/${mm}/${yyyy}`;
+}
+
+function onPositionDateChange(val) {
+    const ddmmyyyy = yyyymmdd_to_ddmmyyyy(val);
+    window.location.href = '/daily-collections?positionDate=' + ddmmyyyy;
+}
+
+function calculateNet() {
+    const grossInput = document.getElementById('grossCollection');
+    const posInput = document.getElementById('posCharges');
+
+    if (parseFloat(grossInput.value) < 0) grossInput.value = 0;
+    if (parseFloat(posInput.value) < 0) posInput.value = 0;
+
+    const gross = parseFloat(grossInput.value) || 0;
+    const pos = parseFloat(posInput.value) || 0;
+
+    const batta = gross * 0.11;
+    const net = gross - batta - pos;
+
+    document.getElementById('batta').value = batta.toFixed(2);
+    document.getElementById('netCollection').value = net.toFixed(2);
+}
+
+document.getElementById('collectionForm').onsubmit = async (e) => {
+    e.preventDefault();
+    const formData = new FormData(e.target);
+    const data = Object.fromEntries(formData.entries());
+
+    // convert dates back to dd/mm/yyyy
+    data.fromDate = yyyymmdd_to_ddmmyyyy(data.fromDate);
+    data.toDate = yyyymmdd_to_ddmmyyyy(data.toDate);
+
+    try {
+        const response = await fetch('/daily-collections/save', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        });
+
+        const result = await response.json();
+        if (result.success) {
+            alert('Collection data saved successfully');
+            window.location.reload();
+        } else {
+            alert('Error: ' + result.message);
         }
-    </style>
+    } catch (err) {
+        alert('Network error while saving data');
+    }
+};
+</script>
 
-    <script>
-        function calculateNet() {
-            const grossInput = document.getElementById('grossCollection');
-            const posInput = document.getElementById('posCharges');
-            
-            // Prevent negative values on input
-            if (parseFloat(grossInput.value) < 0) grossInput.value = 0;
-            if (parseFloat(posInput.value) < 0) posInput.value = 0;
-
-            const gross = parseFloat(grossInput.value) || 0;
-            const pos = parseFloat(posInput.value) || 0;
-            
-            const batta = (gross * 0.11);
-            const net = gross - batta - pos;
-            
-            document.getElementById('batta').value = batta.toFixed(2);
-            document.getElementById('netCollection').value = net.toFixed(2);
-        }
-
-        document.getElementById('collectionForm').onsubmit = async (e) => {
-            e.preventDefault();
-            const formData = new FormData(e.target);
-            const data = Object.fromEntries(formData.entries());
-            
-            // Validation
-            if (parseFloat(data.grossCollection) < 0 || parseFloat(data.posCharges) < 0) {
-                alert('Values cannot be negative');
-                return;
-            }
-
-            try {
-                const response = await fetch('/daily-collections/save', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(data)
-                });
-                
-                const result = await response.json();
-                if (result.success) {
-                    alert('Collection data saved successfully');
-                    window.location.reload();
-                } else {
-                    alert('Error: ' + result.message);
-                }
-            } catch (err) {
-                console.error('Error saving:', err);
-                alert('Network error while saving data');
-            }
-        };
-    </script>
 </body>
 </html>

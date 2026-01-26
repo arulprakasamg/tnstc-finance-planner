@@ -3,6 +3,8 @@ const router = express.Router();
 const fs = require('fs');
 const path = require('path');
 
+const { normalizeToDDMMYYYY } = require('../utils/dateUtils');
+
 const MASTER_DATA_PATH = path.join(__dirname, '../data/bank_master.json');
 
 // Helper to read master data
@@ -29,28 +31,43 @@ const saveDailyBalances = (data) => {
     fs.writeFileSync(BALANCES_DATA_PATH, JSON.stringify(data, null, 2));
 };
 
-// List all bank masters and balances with rolling logic
+/* ================================
+   LIST BANKS + BALANCES
+================================ */
 router.get('/', (req, res) => {
     const banks = getMasterData();
     const dailyBalances = getDailyBalances();
-    const positionDate = req.query.positionDate || new Date().toISOString().split('T')[0];
-    
-    // Sort dates to find the most recent previous balance
-    const sortedDates = Object.keys(dailyBalances).sort().reverse();
 
-    // Enrich banks with balance for the selected date or carry forward
+    const today = normalizeToDDMMYYYY(new Date().toISOString().split('T')[0]);
+    const positionDate = normalizeToDDMMYYYY(req.query.positionDate) || today;
+
+    // Sort dates (dd/mm/yyyy) correctly
+    const sortedDates = Object.keys(dailyBalances)
+        .sort((a, b) => {
+            const [da, ma, ya] = a.split('/');
+            const [db, mb, yb] = b.split('/');
+            return new Date(`${yb}-${mb}-${db}`) - new Date(`${ya}-${ma}-${da}`);
+        });
+
+    // Enrich banks with balance for selected date or carry forward
     const enrichedBanks = banks.map(bank => {
         let balance = 0;
         let isCarriedForward = false;
         let lastUpdated = null;
 
-        if (dailyBalances[positionDate] && dailyBalances[positionDate][bank.id] !== undefined) {
+        if (
+            dailyBalances[positionDate] &&
+            dailyBalances[positionDate][bank.id] !== undefined
+        ) {
             balance = dailyBalances[positionDate][bank.id];
-            isCarriedForward = false;
             lastUpdated = positionDate;
         } else {
-            // Find most recent previous balance
-            const previousDate = sortedDates.find(d => d < positionDate && dailyBalances[d][bank.id] !== undefined);
+            const previousDate = sortedDates.find(
+                d =>
+                    d !== positionDate &&
+                    dailyBalances[d] &&
+                    dailyBalances[d][bank.id] !== undefined
+            );
             if (previousDate) {
                 balance = dailyBalances[previousDate][bank.id];
                 isCarriedForward = true;
@@ -66,17 +83,21 @@ router.get('/', (req, res) => {
         };
     });
 
-    res.render('bank-balances', { banks: enrichedBanks, positionDate });
+    res.render('bank-balances', {
+        banks: enrichedBanks,
+        positionDate
+    });
 });
 
-// Save single bank balance
+/* ================================
+   SAVE SINGLE BANK BALANCE
+================================ */
 router.post('/save-balance', (req, res) => {
-    console.log('POST /save-balance body:', req.body);
     const body = req.body || {};
-    const { bankId, balance, positionDate } = body;
-    
+    const { bankId, balance } = body;
+    const positionDate = normalizeToDDMMYYYY(body.positionDate);
+
     if (!bankId || !positionDate) {
-        console.error('Missing required fields for save-balance');
         return res.status(400).send('Bank ID and Position Date are required');
     }
 
@@ -88,22 +109,26 @@ router.post('/save-balance', (req, res) => {
 
     dailyBalances[positionDate][bankId] = parseFloat(balance) || 0;
     saveDailyBalances(dailyBalances);
-    
-    // For AJAX/JSON requests, send a 200 OK or a JSON response
-    if (req.xhr || req.headers.accept.indexOf('json') > -1 || req.headers['content-type'] === 'application/json') {
-        return res.json({ success: true, redirect: `/bank-balances?positionDate=${positionDate}` });
+
+    if (req.xhr || req.headers.accept?.includes('json')) {
+        return res.json({
+            success: true,
+            redirect: `/bank-balances?positionDate=${positionDate}`
+        });
     }
+
     res.redirect(`/bank-balances?positionDate=${positionDate}`);
 });
 
-// Save all bank balances
+/* ================================
+   SAVE ALL BANK BALANCES
+================================ */
 router.post('/save-all-balances', (req, res) => {
-    console.log('POST /save-all-balances body:', req.body);
     const body = req.body || {};
-    const { balances = {}, positionDate } = body;
+    const balances = body.balances || {};
+    const positionDate = normalizeToDDMMYYYY(body.positionDate);
 
     if (!positionDate) {
-        console.error('Missing positionDate for save-all-balances');
         return res.status(400).send('Position Date is required');
     }
 
@@ -119,19 +144,23 @@ router.post('/save-all-balances', (req, res) => {
 
     saveDailyBalances(dailyBalances);
 
-    // For AJAX/JSON requests
-    if (req.xhr || req.headers.accept.indexOf('json') > -1 || req.headers['content-type'] === 'application/json') {
-        return res.json({ success: true, redirect: `/bank-balances?positionDate=${positionDate}` });
+    if (req.xhr || req.headers.accept?.includes('json')) {
+        return res.json({
+            success: true,
+            redirect: `/bank-balances?positionDate=${positionDate}`
+        });
     }
+
     res.redirect(`/bank-balances?positionDate=${positionDate}`);
 });
 
-// Create new bank master
+/* ================================
+   CREATE BANK MASTER
+================================ */
 router.post('/add', (req, res) => {
     const { accountName, accountNumber, bankName, accountType } = req.body;
     const banks = getMasterData();
 
-    // Unique Account Number validation
     if (banks.some(b => b.accountNumber === accountNumber)) {
         return res.status(400).send('Account Number must be unique');
     }
@@ -149,7 +178,9 @@ router.post('/add', (req, res) => {
     res.redirect('/bank-balances');
 });
 
-// Update bank master
+/* ================================
+   UPDATE BANK MASTER
+================================ */
 router.post('/edit/:id', (req, res) => {
     const { id } = req.params;
     const { accountName, accountNumber, bankName, accountType } = req.body;
@@ -157,14 +188,20 @@ router.post('/edit/:id', (req, res) => {
 
     const index = banks.findIndex(b => b.id === id);
     if (index !== -1) {
-        // Unique Account Number check (excluding current record)
         if (banks.some(b => b.accountNumber === accountNumber && b.id !== id)) {
             return res.status(400).send('Account Number must be unique');
         }
 
-        banks[index] = { ...banks[index], accountName, accountNumber, bankName, accountType };
+        banks[index] = {
+            ...banks[index],
+            accountName,
+            accountNumber,
+            bankName,
+            accountType
+        };
         saveMasterData(banks);
     }
+
     res.redirect('/bank-balances');
 });
 
