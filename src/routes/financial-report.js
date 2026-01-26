@@ -45,20 +45,22 @@ router.get('/', (req, res) => {
         const dailyBalances = JSON.parse(fs.readFileSync(BALANCES_DATA_PATH, 'utf8'));
         const availableDates = Object.keys(dailyBalances).sort();
 
-        // Sync bank balance logic with Dashboard API in index.js
+        // TEMPORARY DIAGNOSTIC STEP: Ignore positionDate, use same logic as dashboard (today/latest)
+        const dashboardToDate = today; 
+
         bankData = BANK_ORDER.map(name => {
             const master = banksMaster.find(b => b.bankName === name);
             let balance = 0;
             if (master) {
-                // Find the latest balance on or before the selected Position Date
-                const effectiveDate = availableDates.slice().reverse().find(d => d <= positionDate && dailyBalances[d][master.id] !== undefined);
+                // Find the latest balance on or before the effective dashboard date
+                const effectiveDate = availableDates.slice().reverse().find(d => d <= dashboardToDate && dailyBalances[d][master.id] !== undefined);
                 if (effectiveDate) balance = dailyBalances[effectiveDate][master.id];
             }
             totalBankBalance += balance;
             return { name, balance };
         });
         
-        console.log(`Financial Report Bank Data for ${positionDate}:`, JSON.stringify(bankData));
+        console.log(`Diagnostic: Financial Report Bank Data (matching Dashboard):`, JSON.stringify(bankData));
         if (bankData.length === 0) console.warn('Financial Report: Bank data array is empty!');
 
         // Collection Data
