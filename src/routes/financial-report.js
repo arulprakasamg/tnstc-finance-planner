@@ -172,7 +172,6 @@ router.get('/', (req, res) => {
 
 router.get('/api/bank-balances', (req, res) => {
     const positionDate = req.query.positionDate || new Date().toISOString().split('T')[0];
-    console.log("Backend API FR bank-balances request for date:", positionDate);
     const MASTER_DATA_PATH = path.join(__dirname, '../data/bank_master.json');
     const BALANCES_DATA_PATH = path.join(__dirname, '../data/bank_balances_daily.json');
     const BANK_ORDER = [
@@ -186,21 +185,25 @@ router.get('/api/bank-balances', (req, res) => {
     try {
         const banksMaster = JSON.parse(fs.readFileSync(MASTER_DATA_PATH, 'utf8'));
         const dailyBalances = JSON.parse(fs.readFileSync(BALANCES_DATA_PATH, 'utf8'));
-        const availableDates = Object.keys(dailyBalances).sort();
+        
+        // Match Dashboard Logic: Filter and find latest available balance on or before positionDate
+        const availableDates = Object.keys(dailyBalances)
+            .filter(date => date <= positionDate)
+            .sort();
 
         let totalBalance = 0;
         const breakdown = BANK_ORDER.map(name => {
             const master = banksMaster.find(b => b.bankName === name);
             let balance = 0;
             if (master) {
-                const effectiveDate = availableDates.slice().reverse().find(d => d <= positionDate && dailyBalances[d][master.id] !== undefined);
+                // Find most recent balance entry across all available dates <= positionDate
+                const effectiveDate = availableDates.slice().reverse().find(d => dailyBalances[d][master.id] !== undefined);
                 if (effectiveDate) balance = dailyBalances[effectiveDate][master.id];
             }
             totalBalance += balance;
             return { name, balance };
         });
 
-        console.log("Backend API FR bank-balances response breakdown count:", breakdown.length);
         res.json({
             bankBalance: totalBalance,
             bankBreakdown: breakdown

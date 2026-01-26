@@ -1,0 +1,62 @@
+You are working on an existing TNSTC Finance Planner web app.
+
+Problem:
+Financial Report → Bank Balances section always shows 0.00
+even though Bank Balances are correctly saved and visible in Dashboard.
+
+Important Context:
+- Dashboard bank balance card is already correct
+- Bank Balances menu saves data correctly
+- Financial Report menu is NOT reflecting saved bank balances
+- Position Date selector exists in Financial Report
+- Data exists for the selected position date
+
+Root Cause (to fix):
+Financial Report is NOT fetching bank balances using the same logic as Dashboard.
+It is either:
+- Calling the wrong API
+- Using wrong date field
+- Ignoring latest available balance <= position date
+
+Your Task:
+FIX ONLY the Financial Report module.
+
+Scope Rules (STRICT):
+- Modify ONLY Financial Report page logic (frontend + backend API used by it)
+- Do NOT modify Dashboard
+- Do NOT modify Bank Balances menu
+- Do NOT modify database schema
+- Do NOT add new tables
+- Do NOT change UI layout or styling
+
+Correct Behaviour Required:
+1. When a Position Date is selected in Financial Report:
+   - Fetch bank balances where balance_date <= selected position date
+   - For each bank, take the LATEST available balance before or on that date
+
+2. Display values in Bank Balances table exactly like Dashboard:
+   - SBI – PLATINUM
+   - IOB – 5555
+   - I.B
+   - IOB – 42300
+   - IOB – 142300
+
+3. If no balance exists for a bank before that date:
+   - Show 0.00
+
+4. Total should be calculated correctly and shown at the bottom.
+
+Technical Instructions:
+- Reuse the SAME query logic used in Dashboard bank balance calculation
+- If Dashboard uses an API, call that same API from Financial Report
+- If Dashboard computes balances server-side, extract and reuse that logic
+- Ensure date comparison is correct (no timezone bug)
+
+Verification Steps (must pass):
+- Enter bank balances on Bank Balances menu
+- Open Financial Report
+- Select same or later position date
+- Bank balances MUST appear (not zero)
+
+Do not explain.
+Just implement the fix cleanly and safely.
