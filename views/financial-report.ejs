@@ -81,7 +81,14 @@
                         <tr id="bank-balance-row">
                             <td>Balance</td>
                             <% bankData.forEach(bank => { %>
-                                <td class="bank-val" data-bank="<%= bank.name %>"><%= (bank.balance / 10000000).toFixed(2) %></td>
+                                <% 
+                                    let displayBalance = 0;
+                                    if (bankData && Array.isArray(bankData)) {
+                                        const found = bankData.find(b => b.name === bank.name);
+                                        if (found) displayBalance = found.balance;
+                                    }
+                                %>
+                                <td class="bank-val" data-bank="<%= bank.name %>"><%= (displayBalance / 10000000).toFixed(2) %></td>
                             <% }) %>
                         </tr>
                     </tbody>
