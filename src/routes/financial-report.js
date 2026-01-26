@@ -61,6 +61,7 @@ router.get('/', (req, res) => {
         });
         
         console.log(`Diagnostic: Financial Report Bank Data (matching Dashboard):`, JSON.stringify(bankData));
+        console.log(`Diagnostic: Total Bank Balance:`, totalBankBalance);
         if (bankData.length === 0) console.warn('Financial Report: Bank data array is empty!');
 
         // Collection Data
