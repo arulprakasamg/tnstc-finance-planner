@@ -71,10 +71,17 @@ router.get('/', (req, res) => {
 
         // HSD Data
         if (fs.existsSync(HSD_DATA_PATH)) {
-            const hsdData = JSON.parse(fs.readFileSync(HSD_DATA_PATH, 'utf8'));
+            let hsdData = [];
+            try {
+                const rawData = JSON.parse(fs.readFileSync(HSD_DATA_PATH, 'utf8'));
+                hsdData = Array.isArray(rawData) ? rawData : (rawData ? Object.values(rawData) : []);
+            } catch (err) {
+                console.error('Error parsing HSD data:', err);
+                hsdData = [];
+            }
             
             // 1. Current day breakdown for payments column
-            const record = hsdData.find(r => r.date === positionDate);
+            const record = hsdData.find(r => r && r.date === positionDate);
             const HSD_ORDER = ["IOC", "BPC", "HPC", "Retail", "Ramnad", "CNG"];
             const HSD_DISPLAY_NAMES = {
                 "IOC": "IOC",
@@ -86,24 +93,24 @@ router.get('/', (req, res) => {
             };
 
             hsdPaymentsList = HSD_ORDER.map(key => {
-                const amount = record ? (record[key] || 0) : 0;
+                const amount = record ? (parseFloat(record[key]) || 0) : 0;
                 hsdTotal += amount;
                 return { name: HSD_DISPLAY_NAMES[key], amount };
             });
 
             // 2. Historical outstanding up to positionDate
             hsdOutstandingHistory = hsdData
-                .filter(r => r.date <= positionDate)
+                .filter(r => r && r.date <= positionDate)
                 .sort((a, b) => new Date(a.date) - new Date(b.date))
                 .map(r => {
-                    const rowTotal = (r.IOC || 0) + (r.BPC || 0) + (r.HPC || 0) + (r.Retail || 0) + (r.Ramnad || 0) + (r.CNG || 0);
+                    const rowTotal = (parseFloat(r.IOC) || 0) + (parseFloat(r.BPC) || 0) + (parseFloat(r.HPC) || 0) + (parseFloat(r.Retail) || 0) + (parseFloat(r.Ramnad) || 0) + (parseFloat(r.CNG) || 0);
                     
-                    hsdGrandTotals.IOC += (r.IOC || 0);
-                    hsdGrandTotals.BPC += (r.BPC || 0);
-                    hsdGrandTotals.HPC += (r.HPC || 0);
-                    hsdGrandTotals.Retail += (r.Retail || 0);
-                    hsdGrandTotals.Ramnad += (r.Ramnad || 0);
-                    hsdGrandTotals.CNG += (r.CNG || 0);
+                    hsdGrandTotals.IOC += (parseFloat(r.IOC) || 0);
+                    hsdGrandTotals.BPC += (parseFloat(r.BPC) || 0);
+                    hsdGrandTotals.HPC += (parseFloat(r.HPC) || 0);
+                    hsdGrandTotals.Retail += (parseFloat(r.Retail) || 0);
+                    hsdGrandTotals.Ramnad += (parseFloat(r.Ramnad) || 0);
+                    hsdGrandTotals.CNG += (parseFloat(r.CNG) || 0);
                     hsdGrandTotals.Total += rowTotal;
 
                     const [y, m, d] = r.date.split('-');
