@@ -1,310 +1,198 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Financial Report - TNSTC Finance Planner</title>
-    <link rel="stylesheet" href="/css/style.css">
-    <style>
-        .report-header { text-align: center; margin-bottom: 2rem; }
-        .report-header h2 { font-size: 1.5rem; color: #1a3c5e; text-transform: uppercase; font-weight: 800; letter-spacing: 1px; }
-        .date-selector-container { background: white; padding: 1.5rem; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); max-width: 400px; margin: 0 auto; display: flex; align-items: center; gap: 1rem; margin-bottom: 2.5rem; }
-        .date-selector-container label { font-weight: 600; color: #1a3c5e; white-space: nowrap; }
-        .date-selector-container input { padding: 0.6rem; border: 1px solid #ddd; border-radius: 6px; width: 100%; }
-        
-        .report-section { margin-top: 3rem; }
-        .section-title { font-size: 1.1rem; font-weight: 800; color: #1a3c5e; border-bottom: 2px solid #1a3c5e; padding-bottom: 0.5rem; margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: flex-end; }
-        .section-title span { font-size: 0.85rem; font-weight: 600; color: #64748b; }
-        
-        .horizontal-table { width: 100%; border-collapse: collapse; background: white; margin-bottom: 1rem; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
-        .horizontal-table th, .horizontal-table td { padding: 1rem; border: 1px solid #e2e8f0; text-align: right; font-size: 0.95rem; }
-        .horizontal-table th { background: #f8fafc; color: #1a3c5e; font-weight: 700; text-align: left; }
-        .horizontal-table td:first-child { background: #f8fafc; color: #1a3c5e; font-weight: 700; text-align: left; width: 150px; }
-        
-        .grand-total { text-align: right; font-size: 1.2rem; font-weight: 800; color: #1a3c5e; margin-top: 1rem; }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Financial Report - TNSTC Finance Planner</title>
+<link rel="stylesheet" href="/css/style.css">
 
-        .split-section { display: grid; grid-template-columns: 1fr 1fr; border: 2px solid #1a3c5e; background: white; margin-top: 1.5rem; }
-        .split-col { padding: 1.5rem; }
-        .split-col:first-child { border-right: 2px solid #1a3c5e; }
-        .split-header { font-weight: 800; text-align: center; border-bottom: 2px solid #1a3c5e; margin: -1.5rem -1.5rem 1.5rem -1.5rem; padding: 0.8rem; background: #f8fafc; color: #1a3c5e; }
-        
-        .data-row { display: flex; justify-content: space-between; margin-bottom: 0.8rem; font-size: 0.95rem; }
-        .data-row .label { color: #1e293b; }
-        .data-row .value { font-weight: 700; color: #1a3c5e; }
-        .data-row.highlight { margin-top: 1.5rem; border-top: 1px solid #e2e8f0; padding-top: 1rem; }
-        .data-row.highlight .value { font-size: 1.1rem; color: #1a3c5e; }
-        .data-row.balance-row { border-top: 2px solid #1a3c5e; margin-top: 1rem; padding-top: 1rem; }
-    </style>
+<style>
+.report-header { text-align:center; margin-bottom:2rem; }
+.report-header h2 { font-size:1.5rem; color:#1a3c5e; font-weight:800; }
+.date-selector-container {
+  background:#fff; padding:1.5rem; border-radius:12px;
+  box-shadow:0 4px 6px rgba(0,0,0,.05);
+  max-width:400px; margin:0 auto 2.5rem;
+  display:flex; gap:1rem; align-items:center;
+}
+.report-section { margin-top:3rem; }
+.section-title {
+  font-weight:800; color:#1a3c5e;
+  border-bottom:2px solid #1a3c5e;
+  padding-bottom:.5rem; margin-bottom:1.5rem;
+  display:flex; justify-content:space-between;
+}
+.horizontal-table {
+  width:100%; border-collapse:collapse; background:#fff;
+  box-shadow:0 4px 6px rgba(0,0,0,.05);
+}
+.horizontal-table th, .horizontal-table td {
+  padding:1rem; border:1px solid #e2e8f0; text-align:right;
+}
+.horizontal-table th:first-child,
+.horizontal-table td:first-child {
+  text-align:left; font-weight:700; background:#f8fafc;
+}
+.grand-total {
+  text-align:right; font-size:1.2rem;
+  font-weight:800; color:#1a3c5e; margin-top:1rem;
+}
+.split-section {
+  display:grid; grid-template-columns:1fr 1fr;
+  border:2px solid #1a3c5e; background:#fff;
+}
+.split-col { padding:1.5rem; }
+.split-col:first-child { border-right:2px solid #1a3c5e; }
+.split-header {
+  text-align:center; font-weight:800;
+  border-bottom:2px solid #1a3c5e;
+  margin:-1.5rem -1.5rem 1.5rem;
+  padding:.8rem; background:#f8fafc;
+}
+.data-row {
+  display:flex; justify-content:space-between;
+  margin-bottom:.8rem;
+}
+.data-row.highlight {
+  margin-top:1.5rem; border-top:1px solid #e2e8f0;
+  padding-top:1rem; font-weight:800;
+}
+</style>
 </head>
+
 <body>
-    <nav class="sidebar">
-        <div class="sidebar-header"><h2>TNSTC Finance</h2></div>
-        <ul class="sidebar-menu">
-            <li><a href="/">Dashboard</a></li>
-            <li><a href="/bank-balances">Bank Balances</a></li>
-            <li><a href="/daily-collections">Daily Collections</a></li>
-            <li><a href="/payment-planning">Payment Planning</a></li>
-            <li><a href="/hsd-management">HSD Management</a></li>
-            <li><a href="/financial-report" class="active">Financial Report</a></li>
-        </ul>
-    </nav>
-    <div class="main-content">
-        <header>
-            <h1>Financial Report</h1>
-            <p class="date-range">Finance Position Analysis</p>
-        </header>
-        <main class="container">
-            <div class="report-header">
-                <h2>TNSTC KUMBAKONAM – FINANCE POSITION</h2>
-            </div>
-            <div class="date-selector-container">
-                <label for="positionDate">Position Date</label>
-                <input type="date" id="positionDate" value="<%= positionDate %>" onchange="updateReportDate(this.value)">
-            </div>
 
-            <!-- Bank Balances Section -->
-            <section class="report-section">
-                <div class="section-title">
-                    BANK BALANCES
-                    <span>(Rs. in Crores)</span>
-                </div>
-                <table class="horizontal-table">
-                    <thead>
-                        <tr id="bank-header-row">
-                            <th>Bank</th>
-                            <% bankData.forEach(bank => { %>
-                                <th style="text-align: right;"><%= bank.name %></th>
-                            <% }) %>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr id="bank-balance-row">
-                            <td>Balance</td>
-                            <% bankData.forEach(bank => { %>
-                                <% 
-                                    let displayBalance = 0;
-                                    if (bankData && Array.isArray(bankData)) {
-                                        const found = bankData.find(b => b.name === bank.name);
-                                        if (found) displayBalance = found.balance;
-                                    }
-                                %>
-                                <td class="bank-val" data-bank="<%= bank.name %>"><%= (displayBalance / 10000000).toFixed(2) %></td>
-                            <% }) %>
-                        </tr>
-                    </tbody>
-                </table>
-                <div class="grand-total" id="bank-grand-total">
-                    Total : <%= (totalBankBalance / 10000000).toFixed(2) %>
-                </div>
-            </section>
+<nav class="sidebar">
+  <div class="sidebar-header"><h2>TNSTC Finance</h2></div>
+  <ul class="sidebar-menu">
+    <li><a href="/">Dashboard</a></li>
+    <li><a href="/bank-balances">Bank Balances</a></li>
+    <li><a href="/daily-collections">Daily Collections</a></li>
+    <li><a href="/payment-planning">Payment Planning</a></li>
+    <li><a href="/hsd-management">HSD Management</a></li>
+    <li><a href="/financial-report" class="active">Financial Report</a></li>
+  </ul>
+</nav>
 
-            <script>
-                async function updateReportDate(date) {
-                    const url = new URL(window.location.href);
-                    url.searchParams.set('positionDate', date);
-                    window.history.pushState({}, '', url);
-                    
-                    const apiURL = `/financial-report/api/bank-balances?positionDate=${date}`;
+<div class="main-content">
+<header>
+  <h1>Financial Report</h1>
+  <p class="date-range">Finance Position Analysis</p>
+</header>
 
-                    try {
-                        const response = await fetch(apiURL);
-                        const data = await response.json();
-                        
-                        if (data && data.bankBreakdown) {
-                            let total = 0;
-                            data.bankBreakdown.forEach(bank => {
-                                const cell = document.querySelector(`.bank-val[data-bank="${bank.name}"]`);
-                                if (cell) {
-                                    const val = (bank.balance / 10000000).toFixed(2);
-                                    cell.innerText = val;
-                                }
-                                total += bank.balance;
-                            });
-                            document.getElementById('bank-grand-total').innerText = `Total : ${(total / 10000000).toFixed(2)}`;
-                        }
-                    } catch (err) {
-                        console.error('FR bank API fetch error:', err);
-                    }
+<main class="container">
 
-                    // Reload page to refresh other non-API wired sections
-                    window.location.href = url.toString();
-                }
+<div class="report-header">
+  <h2>TNSTC KUMBAKONAM – FINANCE POSITION</h2>
+</div>
 
-                // Initialize data on load
-                document.addEventListener('DOMContentLoaded', () => {
-                    const date = document.getElementById('positionDate').value;
-                    if (date) {
-                        // We already have server-side rendered data initially, 
-                        // but this ensures the update function is ready for changes.
-                    }
-                });
-            </script>
+<div class="date-selector-container">
+  <label>Position Date</label>
+  <input type="date" value="<%= positionDate %>"
+         onchange="location.href='?positionDate='+this.value">
+</div>
 
-            <!-- Collection vs Expenses Section -->
-            <section class="report-section">
-                <div class="section-title">
-                    COLLECTION / EXPENSES
-                    <span>(Rs. in Lakhs)</span>
-                </div>
-                <div class="split-section">
-                    <div class="split-col">
-                        <div class="split-header">COLLECTION</div>
-                        <div class="data-row" style="margin-bottom: 2rem;">
-                            <span class="label">Collection Date :</span>
-                            <span class="value"><%= collectionInfo ? collectionInfo.toDate : '-' %></span>
-                        </div>
-                        
-                        <div class="data-row">
-                            <span class="label">Collection</span>
-                            <span class="value"><%= collectionInfo ? (collectionInfo.grossCollection / 100000).toFixed(2) : '0.00' %></span>
-                        </div>
-                        <div class="data-row">
-                            <span class="label">Less Batta 11%</span>
-                            <span class="value"><%= collectionInfo ? (collectionInfo.batta / 100000).toFixed(2) : '0.00' %></span>
-                        </div>
-                        <div class="data-row">
-                            <span class="label">Less POS</span>
-                            <span class="value"><%= collectionInfo ? (collectionInfo.posCharges / 100000).toFixed(2) : '0.00' %></span>
-                        </div>
-                        
-                        <div class="data-row highlight">
-                            <span class="label">Net Collection</span>
-                            <span class="value"><%= collectionInfo ? (collectionInfo.netCollection / 100000).toFixed(2) : '0.00' %></span>
-                        </div>
-                    </div>
-                    
-                    <div class="split-col">
-                        <div class="split-header">EXPENSES</div>
-                        <div class="data-row">
-                            <span class="label">NET</span>
-                            <span class="value"><%= collectionInfo ? (collectionInfo.netCollection / 100000).toFixed(2) : '0.00' %></span>
-                        </div>
-                        <div class="data-row">
-                            <span class="label">Oil Exp</span>
-                            <span class="value"><%= (expenseInfo.oilExp / 100000).toFixed(2) %></span>
-                        </div>
-                        <div class="data-row">
-                            <span class="label">Other Exp</span>
-                            <span class="value"><%= (expenseInfo.otherExp / 100000).toFixed(2) %></span>
-                        </div>
-                        
-                        <div class="data-row highlight">
-                            <span class="label">Total Exp</span>
-                            <span class="value"><%= (expenseInfo.totalExp / 100000).toFixed(2) %></span>
-                        </div>
-                        
-                        <div class="data-row balance-row">
-                            <span class="label">Balance</span>
-                            <span class="value"><%= (expenseInfo.balance / 100000).toFixed(2) %></span>
-                        </div>
-                    </div>
-                </div>
-            </section>
-            <!-- Payments Detail Section -->
-            <section class="report-section">
-                <div class="section-title">
-                    PAYMENTS
-                    <span>(Rs. in Lakhs)</span>
-                </div>
-                <div class="split-section">
-                    <div class="split-col">
-                        <div class="split-header">OTHER PAYMENTS</div>
-                        <table class="horizontal-table" style="box-shadow: none; border: none; margin-bottom: 0;">
-                            <tbody>
-                                <% if (otherPaymentsList.length > 0) { %>
-                                    <% otherPaymentsList.forEach(item => { %>
-                                        <tr>
-                                            <td style="text-align: left; background: none; border-left: none; width: auto;"><%= item.subCategory %></td>
-                                            <td style="text-align: right; border-right: none;"><%= (item.amount / 100000).toFixed(2) %></td>
-                                        </tr>
-                                    <% }) %>
-                                <% } else { %>
-                                    <tr>
-                                        <td colspan="2" style="text-align: center; color: #64748b; font-style: italic; border: none;">No Other Payments</td>
-                                    </tr>
-                                <% } %>
-                            </tbody>
-                        </table>
-                        <% if (otherPaymentsList.length > 0) { %>
-                        <div class="grand-total" style="font-size: 1rem; border-top: 1px solid #e2e8f0; padding-top: 0.5rem;">
-                            Total : <%= (expenseInfo.otherExp / 100000).toFixed(2) %>
-                        </div>
-                        <% } %>
-                    </div>
-                    
-                    <div class="split-col">
-                        <div class="split-header">HSD PAYMENTS</div>
-                        <table class="horizontal-table" style="box-shadow: none; border: none; margin-bottom: 0;">
-                            <tbody>
-                                <% hsdPaymentsList.forEach(item => { %>
-                                    <tr>
-                                        <td style="text-align: left; background: none; border-left: none; width: auto;"><%= item.name %></td>
-                                        <td style="text-align: right; border-right: none;"><%= (item.amount / 100000).toFixed(2) %></td>
-                                    </tr>
-                                <% }) %>
-                            </tbody>
-                        </table>
-                        <div class="grand-total" style="font-size: 1rem; border-top: 1px solid #e2e8f0; padding-top: 0.5rem;">
-                            Total : <%= (hsdTotal / 100000).toFixed(2) %>
-                        </div>
-                    </div>
-                </div>
-            </section>
-            <!-- HSD Outstanding Section -->
-            <section class="report-section">
-                <div class="section-title">
-                    HSD OUTSTANDING
-                </div>
-                <% if (hsdOutstandingHistory.length > 0) { %>
-                <table class="horizontal-table" style="text-align: right;">
-                    <thead>
-                        <tr>
-                            <th style="text-align: center; width: 60px;">S.No</th>
-                            <th style="text-align: center; width: 120px;">Date</th>
-                            <th style="text-align: right;">IOC</th>
-                            <th style="text-align: right;">BPC</th>
-                            <th style="text-align: right;">HPC</th>
-                            <th style="text-align: right;">Retail / Confed</th>
-                            <th style="text-align: right;">Ramnad</th>
-                            <th style="text-align: right;">CNG</th>
-                            <th style="text-align: right;">Total</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <% hsdOutstandingHistory.forEach((r, index) => { %>
-                            <tr>
-                                <td style="text-align: center; background: none; font-weight: 400;"><%= index + 1 %></td>
-                                <td style="text-align: center; background: none; font-weight: 400;"><%= r.formattedDate %></td>
-                                <td><%= (r.IOC / 100000).toFixed(2) %></td>
-                                <td><%= (r.BPC / 100000).toFixed(2) %></td>
-                                <td><%= (r.HPC / 100000).toFixed(2) %></td>
-                                <td><%= (r.Retail / 100000).toFixed(2) %></td>
-                                <td><%= (r.Ramnad / 100000).toFixed(2) %></td>
-                                <td><%= (r.CNG / 100000).toFixed(2) %></td>
-                                <td style="font-weight: 800;"><%= (r.total / 100000).toFixed(2) %></td>
-                            </tr>
-                        <% }) %>
-                    </tbody>
-                    <tfoot style="background: #f8fafc; font-weight: 800; border-top: 2px solid #1a3c5e;">
-                        <tr>
-                            <td colspan="2" style="text-align: right;">TOTAL</td>
-                            <td><%= (hsdGrandTotals.IOC / 100000).toFixed(2) %></td>
-                            <td><%= (hsdGrandTotals.BPC / 100000).toFixed(2) %></td>
-                            <td><%= (hsdGrandTotals.HPC / 100000).toFixed(2) %></td>
-                            <td><%= (hsdGrandTotals.Retail / 100000).toFixed(2) %></td>
-                            <td><%= (hsdGrandTotals.Ramnad / 100000).toFixed(2) %></td>
-                            <td><%= (hsdGrandTotals.CNG / 100000).toFixed(2) %></td>
-                            <td style="color: #1a3c5e;"><%= (hsdGrandTotals.Total / 100000).toFixed(2) %></td>
-                        </tr>
-                    </tfoot>
-                </table>
-                <% } else { %>
-                <div style="text-align: center; padding: 2rem; background: white; border: 1px solid #e2e8f0; border-radius: 8px; color: #64748b; font-style: italic;">
-                    No HSD Outstanding Data
-                </div>
-                <% } %>
-            </section>
-        </main>
-    </div>
+<!-- ================= BANK BALANCES ================= -->
+<section class="report-section">
+<div class="section-title">
+  BANK BALANCES <span>(Rs. in Crores)</span>
+</div>
+
+<table class="horizontal-table">
+<thead>
+<tr>
+  <th>Bank</th>
+  <% bankData.forEach(b => { %>
+    <th><%= b.name %></th>
+  <% }) %>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+  <td>Balance</td>
+  <% 
+    let bankTotal = 0;
+    bankData.forEach(b => {
+      bankTotal += b.balance;
+  %>
+    <td><%= (b.balance / 10000000).toFixed(2) %></td>
+  <% }) %>
+</tr>
+</tbody>
+</table>
+
+<div class="grand-total">
+  Total : <%= (bankTotal / 10000000).toFixed(2) %>
+</div>
+</section>
+
+<!-- ================= COLLECTION / EXPENSES ================= -->
+<section class="report-section">
+<div class="section-title">
+  COLLECTION / EXPENSES <span>(Rs. in Lakhs)</span>
+</div>
+
+<div class="split-section">
+
+<div class="split-col">
+<div class="split-header">COLLECTION</div>
+<div class="data-row"><span>Collection</span>
+<span><%= collectionInfo ? (collectionInfo.grossCollection/100000).toFixed(2) : '0.00' %></span></div>
+<div class="data-row"><span>Less 11%</span>
+<span><%= collectionInfo ? (collectionInfo.batta/100000).toFixed(2) : '0.00' %></span></div>
+<div class="data-row"><span>POS</span>
+<span><%= collectionInfo ? (collectionInfo.posCharges/100000).toFixed(2) : '0.00' %></span></div>
+<div class="data-row highlight"><span>Net</span>
+<span><%= collectionInfo ? (collectionInfo.netCollection/100000).toFixed(2) : '0.00' %></span></div>
+</div>
+
+<div class="split-col">
+<div class="split-header">EXPENSES</div>
+<div class="data-row"><span>Oil</span>
+<span><%= (expenseInfo.oilExp/100000).toFixed(2) %></span></div>
+<div class="data-row"><span>Other</span>
+<span><%= (expenseInfo.otherExp/100000).toFixed(2) %></span></div>
+<div class="data-row highlight"><span>Total</span>
+<span><%= (expenseInfo.totalExp/100000).toFixed(2) %></span></div>
+</div>
+
+</div>
+</section>
+
+<!-- ================= PAYMENTS ================= -->
+<section class="report-section">
+<div class="section-title">
+  PAYMENTS <span>(Rs. in Lakhs)</span>
+</div>
+
+<div class="split-section">
+
+<div class="split-col">
+<div class="split-header">OTHER PAYMENTS</div>
+<% if(otherPaymentsList.length){ %>
+  <% otherPaymentsList.forEach(p => { %>
+    <div class="data-row"><span><%= p.subCategory %></span>
+    <span><%= (p.amount/100000).toFixed(2) %></span></div>
+  <% }) %>
+<% } else { %>
+  <div class="data-row">No Other Payments</div>
+<% } %>
+</div>
+
+<div class="split-col">
+<div class="split-header">HSD PAYMENTS</div>
+<% hsdPaymentsList.forEach(p => { %>
+  <div class="data-row"><span><%= p.name %></span>
+  <span><%= (p.amount/100000).toFixed(2) %></span></div>
+<% }) %>
+</div>
+
+</div>
+</section>
+
+</main>
+</div>
+
 </body>
 </html>
