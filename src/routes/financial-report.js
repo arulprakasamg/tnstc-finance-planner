@@ -172,6 +172,7 @@ router.get('/', (req, res) => {
 
 router.get('/api/bank-balances', (req, res) => {
     const positionDate = req.query.positionDate || new Date().toISOString().split('T')[0];
+    console.log("Backend API FR bank-balances request for date:", positionDate);
     const MASTER_DATA_PATH = path.join(__dirname, '../data/bank_master.json');
     const BALANCES_DATA_PATH = path.join(__dirname, '../data/bank_balances_daily.json');
     const BANK_ORDER = [
@@ -199,6 +200,7 @@ router.get('/api/bank-balances', (req, res) => {
             return { name, balance };
         });
 
+        console.log("Backend API FR bank-balances response breakdown count:", breakdown.length);
         res.json({
             bankBalance: totalBalance,
             bankBreakdown: breakdown

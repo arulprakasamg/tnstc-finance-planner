@@ -93,17 +93,22 @@
 
             <script>
                 async function updateReportDate(date) {
+                    console.log("FR positionDate selected:", date);
                     // Update URL for server-side refresh of other sections
                     const url = new URL(window.location.href);
                     url.searchParams.set('positionDate', date);
                     window.history.pushState({}, '', url);
                     
+                    const apiURL = `/financial-report/api/bank-balances?positionDate=${date}`;
+                    console.log("FR bank API request URL:", apiURL);
+
                     // Fetch fresh bank balances via API
                     try {
-                        const response = await fetch(`/financial-report/api/bank-balances?positionDate=${date}`);
+                        const response = await fetch(apiURL);
                         const data = await response.json();
+                        console.log("FR bank API full response:", data);
                         
-                        if (data && data.bankBreakdown) {
+                        if (data && data.bankBreakdown && data.bankBreakdown.length > 0) {
                             let total = 0;
                             data.bankBreakdown.forEach(bank => {
                                 const cell = document.querySelector(`.bank-val[data-bank="${bank.name}"]`);
@@ -114,9 +119,15 @@
                                 total += bank.balance;
                             });
                             document.getElementById('bank-grand-total').innerText = `Total : ${(total / 10000000).toFixed(2)}`;
+                        } else {
+                            console.warn("FR bank API returned empty breakdown");
+                            // IMPORTANT: If API response is empty, do not fallback to zeros. 
+                            // Show empty state instead (or leave as is to indicate data missing).
+                            document.getElementById('bank-balance-row').innerHTML = '<td colspan="100" style="text-align: center; color: #64748b; font-style: italic;">No Bank Balance Data Available for this Date</td>';
+                            document.getElementById('bank-grand-total').innerText = 'Total : -';
                         }
                     } catch (err) {
-                        console.error('Error updating bank balances:', err);
+                        console.error('FR bank API fetch error:', err);
                     }
 
                     // Reload page to refresh other non-API wired sections for now
