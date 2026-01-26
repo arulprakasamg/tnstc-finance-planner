@@ -3,8 +3,6 @@ const router = express.Router();
 const fs = require('fs');
 const path = require('path');
 
-const { normalizeToDDMMYYYY } = require('../utils/dateUtils');
-
 const COLLECTIONS_DATA_PATH = path.join(__dirname, '../data/daily_collections.json');
 
 // Helper to read collections data
@@ -13,7 +11,7 @@ const getCollections = () => {
     try {
         const data = fs.readFileSync(COLLECTIONS_DATA_PATH, 'utf8');
         return JSON.parse(data || '{}');
-    } catch {
+    } catch (e) {
         return {};
     }
 };
@@ -23,27 +21,26 @@ const saveCollections = (data) => {
     fs.writeFileSync(COLLECTIONS_DATA_PATH, JSON.stringify(data, null, 2));
 };
 
-// Helper to get today's date (dd/mm/yyyy)
+// Helper to get today's date string
 const getTodayDate = () => {
-    return new Date().toLocaleDateString('en-GB');
+    return new Date().toISOString().split('T')[0];
 };
 
-// Helper to get yesterday's date (dd/mm/yyyy)
+// Helper to get yesterday's date string
 const getYesterdayDate = () => {
-    const d = new Date();
-    d.setDate(d.getDate() - 1);
-    return d.toLocaleDateString('en-GB');
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    return yesterday.toISOString().split('T')[0];
 };
 
 // Render Daily Collections Page
 router.get('/', (req, res) => {
     const collections = getCollections();
-
     const today = getTodayDate();
     const yesterday = getYesterdayDate();
-
-    const positionDate = normalizeToDDMMYYYY(req.query.positionDate) || today;
-
+    
+    // Default search/entry date to today
+    const positionDate = req.query.positionDate || today;
     const entry = collections[positionDate] || {
         fromDate: yesterday,
         toDate: yesterday,
@@ -53,32 +50,22 @@ router.get('/', (req, res) => {
         netCollection: 0
     };
 
-    res.render('daily-collections', {
-        entry,
-        positionDate
-    });
+    res.render('daily-collections', { entry, positionDate });
 });
 
 // Save/Update Collection Entry
 router.post('/save', (req, res) => {
+    const { positionDate, fromDate, toDate, grossCollection, batta, posCharges, netCollection } = req.body;
     const collections = getCollections();
-
-    const positionDate = normalizeToDDMMYYYY(req.body.positionDate);
-    const fromDate = normalizeToDDMMYYYY(req.body.fromDate);
-    const toDate = normalizeToDDMMYYYY(req.body.toDate);
-
-    if (!positionDate) {
-        return res.status(400).json({ success: false, message: 'Invalid position date' });
-    }
 
     collections[positionDate] = {
         fromDate,
         toDate,
-        grossCollection: parseFloat(req.body.grossCollection) || 0,
-        batta: parseFloat(req.body.batta) || 0,
-        posCharges: parseFloat(req.body.posCharges) || 0,
-        netCollection: parseFloat(req.body.netCollection) || 0,
-        updatedAt: new Date().toLocaleString('en-GB')
+        grossCollection: parseFloat(grossCollection) || 0,
+        batta: parseFloat(batta) || 0,
+        posCharges: parseFloat(posCharges) || 0,
+        netCollection: parseFloat(netCollection) || 0,
+        updatedAt: new Date().toISOString()
     };
 
     saveCollections(collections);

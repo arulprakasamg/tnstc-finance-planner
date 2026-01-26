@@ -16,6 +16,7 @@
             <li><a href="/payment-planning" class="active">Payment Planning</a></li>
             <li><a href="/hsd-management">HSD Management</a></li>
             <li><a href="/financial-report">Financial Report</a></li>
+            <li><a href="#">Financial Reports</a></li>
         </ul>
     </nav>
     <div class="main-content">
@@ -44,14 +45,7 @@
                     <h2>Planned Payment Entry</h2>
                     <div class="controls">
                         <label>Position Date:</label>
-                        <input type="date" id="posDate"
-                               value="<%= positionDate && positionDate.includes('/') 
-                                   ? positionDate.split('/').reverse().join('-') 
-                                   : positionDate %>"
-                               onchange="
-                                   const d=this.value.split('-');
-                                   window.location.href='/payment-planning?positionDate='+d[2]+'/'+d[1]+'/'+d[0];
-                               ">
+                        <input type="date" id="posDate" value="<%= positionDate %>" onchange="window.location.href='/payment-planning?positionDate='+this.value">
                     </div>
                 </div>
 
