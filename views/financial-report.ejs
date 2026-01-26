@@ -100,7 +100,6 @@
 
             <script>
                 async function updateReportDate(date) {
-                    console.log("Report Bank Data (Selected Date):", date);
                     const url = new URL(window.location.href);
                     url.searchParams.set('positionDate', date);
                     window.history.pushState({}, '', url);
@@ -110,23 +109,18 @@
                     try {
                         const response = await fetch(apiURL);
                         const data = await response.json();
-                        console.log("Report Bank Data (API Response):", data);
                         
-                        if (data && data.bankBreakdown && data.bankBreakdown.length > 0) {
+                        if (data && data.bankBreakdown) {
                             let total = 0;
                             data.bankBreakdown.forEach(bank => {
-                                // Explicit mapping by bank name to ensure correct binding
                                 const cell = document.querySelector(`.bank-val[data-bank="${bank.name}"]`);
                                 if (cell) {
                                     const val = (bank.balance / 10000000).toFixed(2);
                                     cell.innerText = val;
-                                    console.log(`Mapping ${bank.name}: ${val}`);
                                 }
                                 total += bank.balance;
                             });
-                            const grandTotal = (total / 10000000).toFixed(2);
-                            document.getElementById('bank-grand-total').innerText = `Total : ${grandTotal}`;
-                            console.log("Report Bank Data (Total):", grandTotal);
+                            document.getElementById('bank-grand-total').innerText = `Total : ${(total / 10000000).toFixed(2)}`;
                         }
                     } catch (err) {
                         console.error('FR bank API fetch error:', err);
@@ -135,6 +129,15 @@
                     // Reload page to refresh other non-API wired sections
                     window.location.href = url.toString();
                 }
+
+                // Initialize data on load
+                document.addEventListener('DOMContentLoaded', () => {
+                    const date = document.getElementById('positionDate').value;
+                    if (date) {
+                        // We already have server-side rendered data initially, 
+                        // but this ensures the update function is ready for changes.
+                    }
+                });
             </script>
 
             <!-- Collection vs Expenses Section -->
