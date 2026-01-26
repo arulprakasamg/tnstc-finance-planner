@@ -59,7 +59,7 @@
             </div>
             <div class="date-selector-container">
                 <label for="positionDate">Position Date</label>
-                <input type="date" id="positionDate" value="<%= positionDate %>" onchange="window.location.href='/financial-report?positionDate='+this.value">
+                <input type="date" id="positionDate" value="<%= positionDate %>" onchange="updateReportDate(this.value)">
             </div>
 
             <!-- Bank Balances Section -->
@@ -70,7 +70,7 @@
                 </div>
                 <table class="horizontal-table">
                     <thead>
-                        <tr>
+                        <tr id="bank-header-row">
                             <th>Bank</th>
                             <% bankData.forEach(bank => { %>
                                 <th style="text-align: right;"><%= bank.name %></th>
@@ -78,18 +78,51 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
+                        <tr id="bank-balance-row">
                             <td>Balance</td>
                             <% bankData.forEach(bank => { %>
-                                <td><%= (bank.balance / 10000000).toFixed(2) %></td>
+                                <td class="bank-val" data-bank="<%= bank.name %>"><%= (bank.balance / 10000000).toFixed(2) %></td>
                             <% }) %>
                         </tr>
                     </tbody>
                 </table>
-                <div class="grand-total">
+                <div class="grand-total" id="bank-grand-total">
                     Total : <%= (totalBankBalance / 10000000).toFixed(2) %>
                 </div>
             </section>
+
+            <script>
+                async function updateReportDate(date) {
+                    // Update URL for server-side refresh of other sections
+                    const url = new URL(window.location.href);
+                    url.searchParams.set('positionDate', date);
+                    window.history.pushState({}, '', url);
+                    
+                    // Fetch fresh bank balances via API
+                    try {
+                        const response = await fetch(`/financial-report/api/bank-balances?positionDate=${date}`);
+                        const data = await response.json();
+                        
+                        if (data && data.bankBreakdown) {
+                            let total = 0;
+                            data.bankBreakdown.forEach(bank => {
+                                const cell = document.querySelector(`.bank-val[data-bank="${bank.name}"]`);
+                                if (cell) {
+                                    const val = (bank.balance / 10000000).toFixed(2);
+                                    cell.innerText = val;
+                                }
+                                total += bank.balance;
+                            });
+                            document.getElementById('bank-grand-total').innerText = `Total : ${(total / 10000000).toFixed(2)}`;
+                        }
+                    } catch (err) {
+                        console.error('Error updating bank balances:', err);
+                    }
+
+                    // Reload page to refresh other non-API wired sections for now
+                    window.location.href = url.toString();
+                }
+            </script>
 
             <!-- Collection vs Expenses Section -->
             <section class="report-section">

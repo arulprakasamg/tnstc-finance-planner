@@ -165,8 +165,48 @@ router.get('/', (req, res) => {
         hsdPaymentsList,
         hsdTotal,
         hsdOutstandingHistory,
-        hsdGrandTotals
+        hsdGrandTotals,
+        BANK_ORDER
     });
+});
+
+router.get('/api/bank-balances', (req, res) => {
+    const positionDate = req.query.positionDate || new Date().toISOString().split('T')[0];
+    const MASTER_DATA_PATH = path.join(__dirname, '../data/bank_master.json');
+    const BALANCES_DATA_PATH = path.join(__dirname, '../data/bank_balances_daily.json');
+    const BANK_ORDER = [
+        "SBI – PLATINUM",
+        "IOB – 5555",
+        "I.B",
+        "IOB – 42300",
+        "IOB – 142300"
+    ];
+
+    try {
+        const banksMaster = JSON.parse(fs.readFileSync(MASTER_DATA_PATH, 'utf8'));
+        const dailyBalances = JSON.parse(fs.readFileSync(BALANCES_DATA_PATH, 'utf8'));
+        const availableDates = Object.keys(dailyBalances).sort();
+
+        let totalBalance = 0;
+        const breakdown = BANK_ORDER.map(name => {
+            const master = banksMaster.find(b => b.bankName === name);
+            let balance = 0;
+            if (master) {
+                const effectiveDate = availableDates.slice().reverse().find(d => d <= positionDate && dailyBalances[d][master.id] !== undefined);
+                if (effectiveDate) balance = dailyBalances[effectiveDate][master.id];
+            }
+            totalBalance += balance;
+            return { name, balance };
+        });
+
+        res.json({
+            bankBalance: totalBalance,
+            bankBreakdown: breakdown
+        });
+    } catch (err) {
+        console.error('Financial Report Bank API Error:', err);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
 });
 
 module.exports = router;
