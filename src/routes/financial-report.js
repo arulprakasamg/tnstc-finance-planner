@@ -3,156 +3,81 @@ const router = express.Router();
 const fs = require('fs');
 const path = require('path');
 const { toDDMMYYYY, ddmmyyyyToYmd } = require('../utils/dateUtils');
+const { getFinancePosition } = require('../utils/financeUtils');
 
 router.get('/', (req, res) => {
     const rawToday = new Date().toISOString().split('T')[0];
     const today = toDDMMYYYY(rawToday);
     const positionDate = req.query.positionDate ? toDDMMYYYY(req.query.positionDate) : today;
 
-    const MASTER_DATA_PATH = path.join(__dirname, '../data/bank_master.json');
-    const BALANCES_DATA_PATH = path.join(__dirname, '../data/bank_balances_daily.json');
+    const financePos = getFinancePosition(positionDate);
 
-    const BANK_ORDER = [
-        "SBI – PLATINUM",
-        "IOB – 5555",
-        "I.B",
-        "IOB – 42300",
-        "IOB – 142300"
-    ];
-
-    const COLLECTIONS_PATH = path.join(__dirname, '../data/daily_collections.json');
-    const PAYMENTS_PATH = path.join(__dirname, '../data/payment_planning.json');
-    const HSD_DATA_PATH = path.join(__dirname, '../data/hsd_purchase.json');
-
-    let bankData = [];
-    let totalBankBalance = 0;
-    let collectionInfo = null;
-    let expenseInfo = {
-        oilExp: 0,
-        otherExp: 0,
-        totalExp: 0,
-        balance: 0
+    // Map financePos to existing view variables for compatibility
+    const bankData = financePos.bankBreakdown;
+    const totalBankBalance = financePos.openingBalance;
+    const collectionInfo = financePos.collectionInfo;
+    const expenseInfo = {
+        oilExp: financePos.payments.oil,
+        otherExp: financePos.payments.other,
+        totalExp: financePos.payments.total,
+        balance: (financePos.collectionInfo ? financePos.collectionInfo.netCollection : 0) - financePos.payments.total
     };
+
+    // Prepare otherPaymentsList and hsdPaymentsList as before
     let otherPaymentsList = [];
+    const PAYMENTS_PATH = path.join(__dirname, '../data/payment_planning.json');
+    if (fs.existsSync(PAYMENTS_PATH)) {
+        const planning = JSON.parse(fs.readFileSync(PAYMENTS_PATH, 'utf8'));
+        if (planning[positionDate]) {
+            planning[positionDate].forEach(p => {
+                if (p.category !== 'Oil Companies') {
+                    const existing = otherPaymentsList.find(item => item.subCategory === p.subCategory);
+                    if (existing) { existing.amount += p.amount; }
+                    else { otherPaymentsList.push({ subCategory: p.subCategory, amount: p.amount }); }
+                }
+            });
+        }
+    }
+
     let hsdPaymentsList = [];
     let hsdTotal = 0;
-    let hsdOutstandingHistory = [];
-    let hsdGrandTotals = {
-        IOC: 0, BPC: 0, HPC: 0, Retail: 0, Ramnad: 0, CNG: 0, Total: 0
-    };
-
-    try {
-        const banksMaster = JSON.parse(fs.readFileSync(MASTER_DATA_PATH, 'utf8'));
-        const dailyBalances = JSON.parse(fs.readFileSync(BALANCES_DATA_PATH, 'utf8'));
-        
-        // Sort dates correctly for carry-forward logic
-        const availableDates = Object.keys(dailyBalances).sort((a, b) => {
-            return ddmmyyyyToYmd(b).localeCompare(ddmmyyyyToYmd(a));
+    const HSD_DATA_PATH = path.join(__dirname, '../data/hsd_purchase.json');
+    if (fs.existsSync(HSD_DATA_PATH)) {
+        const hsdRaw = JSON.parse(fs.readFileSync(HSD_DATA_PATH, 'utf8'));
+        const record = hsdRaw[positionDate] || hsdRaw[ddmmyyyyToYmd(positionDate)];
+        const HSD_ORDER = ["IOC", "BPC", "HPC", "Retail", "Ramnad", "CNG"];
+        const HSD_DISPLAY_NAMES = {
+            "IOC": "IOC", "BPC": "BPC", "HPC": "HPC",
+            "Retail": "Retail / Confed", "Ramnad": "Ramnad", "CNG": "CNG"
+        };
+        hsdPaymentsList = HSD_ORDER.map(key => {
+            const amount = record ? (Number(record[key]) || 0) : 0;
+            hsdTotal += amount;
+            return { name: HSD_DISPLAY_NAMES[key], amount };
         });
-
-        // Bank Balance logic with Carry Forward
-        bankData = BANK_ORDER.map(name => {
-            const master = banksMaster.find(b => b.accountName === name || b.bankName === name);
-            let balance = 0;
-            if (master) {
-                // Find most recent balance on or before positionDate using master.id
-                const effectiveDate = availableDates.find(d => ddmmyyyyToYmd(d) <= ddmmyyyyToYmd(positionDate) && dailyBalances[d][master.id] !== undefined);
-                if (effectiveDate) {
-                    balance = Number(dailyBalances[effectiveDate][master.id]) || 0;
-                }
-            }
-            totalBankBalance += balance;
-            return { name, balance };
-        });
-
-        // Collection Data
-        if (fs.existsSync(COLLECTIONS_PATH)) {
-            const collections = JSON.parse(fs.readFileSync(COLLECTIONS_PATH, 'utf8'));
-            if (collections[positionDate]) {
-                collectionInfo = collections[positionDate];
-            }
-        }
-
-        // HSD Data (Outstanding History)
-        if (fs.existsSync(HSD_DATA_PATH)) {
-            const hsdRaw = JSON.parse(fs.readFileSync(HSD_DATA_PATH, 'utf8'));
-            let hsdArray = [];
-            
-            // Standardize into array of {date, ...fields}
-            Object.keys(hsdRaw).forEach(dateStr => {
-                const standardizedDate = toDDMMYYYY(dateStr); // Ensure dd/mm/yyyy
-                hsdArray.push({
-                    date: standardizedDate,
-                    ...hsdRaw[dateStr]
-                });
-            });
-
-            // Find specific record for current positionDate for HSD Payments Section
-            const record = hsdArray.find(r => r.date === positionDate);
-            const HSD_ORDER = ["IOC", "BPC", "HPC", "Retail", "Ramnad", "CNG"];
-            const HSD_DISPLAY_NAMES = {
-                "IOC": "IOC", "BPC": "BPC", "HPC": "HPC",
-                "Retail": "Retail / Confed", "Ramnad": "Ramnad", "CNG": "CNG"
-            };
-
-            hsdPaymentsList = HSD_ORDER.map(key => {
-                const amount = record ? (Number(record[key]) || 0) : 0;
-                hsdTotal += amount;
-                return { name: HSD_DISPLAY_NAMES[key], amount };
-            });
-
-            // Reset grand totals before calculation
-            hsdGrandTotals = { IOC: 0, BPC: 0, HPC: 0, Retail: 0, Ramnad: 0, CNG: 0, Total: 0 };
-
-            // Calculate history up to positionDate
-            hsdOutstandingHistory = hsdArray
-                .filter(r => ddmmyyyyToYmd(r.date) <= ddmmyyyyToYmd(positionDate))
-                .sort((a, b) => ddmmyyyyToYmd(a.date).localeCompare(ddmmyyyyToYmd(b.date)))
-                .map(r => {
-                    const rowIOC = Number(r.IOC) || 0;
-                    const rowBPC = Number(r.BPC) || 0;
-                    const rowHPC = Number(r.HPC) || 0;
-                    const rowRetail = Number(r.Retail) || 0;
-                    const rowRamnad = Number(r.Ramnad) || 0;
-                    const rowCNG = Number(r.CNG) || 0;
-                    
-                    const rowTotal = rowIOC + rowBPC + rowHPC + rowRetail + rowRamnad + rowCNG;
-                    
-                    hsdGrandTotals.IOC += rowIOC;
-                    hsdGrandTotals.BPC += rowBPC;
-                    hsdGrandTotals.HPC += rowHPC;
-                    hsdGrandTotals.Retail += rowRetail;
-                    hsdGrandTotals.Ramnad += rowRamnad;
-                    hsdGrandTotals.CNG += rowCNG;
-                    hsdGrandTotals.Total += rowTotal;
-                    
-                    return { ...r, IOC: rowIOC, BPC: rowBPC, HPC: rowHPC, Retail: rowRetail, Ramnad: rowRamnad, CNG: rowCNG, formattedDate: r.date, total: rowTotal };
-                });
-        }
-
-        // Expense Data (Planned Payments)
-        if (fs.existsSync(PAYMENTS_PATH)) {
-            const planning = JSON.parse(fs.readFileSync(PAYMENTS_PATH, 'utf8'));
-            if (planning[positionDate]) {
-                planning[positionDate].forEach(p => {
-                    if (p.category === 'Oil Companies') {
-                        expenseInfo.oilExp += p.amount;
-                    } else {
-                        expenseInfo.otherExp += p.amount;
-                        const existing = otherPaymentsList.find(item => item.subCategory === p.subCategory);
-                        if (existing) { existing.amount += p.amount; }
-                        else { otherPaymentsList.push({ subCategory: p.subCategory, amount: p.amount }); }
-                    }
-                });
-                expenseInfo.totalExp = expenseInfo.oilExp + expenseInfo.otherExp;
-                if (collectionInfo) {
-                    expenseInfo.balance = collectionInfo.netCollection - expenseInfo.totalExp;
-                }
-            }
-        }
-    } catch (err) {
-        console.error('Financial Report Data Error:', err);
     }
+
+    // Prepare hsdOutstandingHistory as before for the ledger
+    let hsdOutstandingHistory = [];
+    let hsdGrandTotals = financePos.hsdOutstanding;
+    if (fs.existsSync(HSD_DATA_PATH)) {
+        const hsdRaw = JSON.parse(fs.readFileSync(HSD_DATA_PATH, 'utf8'));
+        hsdOutstandingHistory = Object.keys(hsdRaw)
+            .filter(d => ddmmyyyyToYmd(toDDMMYYYY(d)) <= ddmmyyyyToYmd(positionDate))
+            .sort((a, b) => ddmmyyyyToYmd(toDDMMYYYY(a)).localeCompare(ddmmyyyyToYmd(toDDMMYYYY(b))))
+            .map(dateStr => {
+                const r = hsdRaw[dateStr];
+                const rowTotal = (Number(r.IOC) || 0) + (Number(r.BPC) || 0) + (Number(r.HPC) || 0) + (Number(r.Retail) || 0) + (Number(r.Ramnad) || 0) + (Number(r.CNG) || 0);
+                return { ...r, formattedDate: toDDMMYYYY(dateStr), total: rowTotal };
+            });
+    }
+
+    res.render('financial-report', { 
+        today, positionDate, bankData, totalBankBalance,
+        collectionInfo, expenseInfo, otherPaymentsList,
+        hsdPaymentsList, hsdTotal, hsdOutstandingHistory, hsdGrandTotals
+    });
+});
 
     res.render('financial-report', { 
         today, positionDate, bankData, totalBankBalance,
