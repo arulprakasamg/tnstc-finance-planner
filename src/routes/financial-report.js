@@ -52,14 +52,14 @@ router.get('/', (req, res) => {
 
         // Bank Balance logic with Carry Forward
         bankData = BANK_ORDER.map(name => {
-            const master = banksMaster.find(b => b.bankName === name);
+            const master = banksMaster.find(b => b.accountName === name || b.bankName === name);
             let balance = 0;
             if (master) {
                 if (dailyBalances[positionDate] && dailyBalances[positionDate][master.id] !== undefined) {
-                    balance = dailyBalances[positionDate][master.id];
+                    balance = Number(dailyBalances[positionDate][master.id]) || 0;
                 } else {
                     const previousDate = availableDates.find(d => ddmmyyyyToYmd(d) < ddmmyyyyToYmd(positionDate) && dailyBalances[d][master.id] !== undefined);
-                    if (previousDate) balance = dailyBalances[previousDate][master.id];
+                    if (previousDate) balance = Number(dailyBalances[previousDate][master.id]) || 0;
                 }
             }
             totalBankBalance += balance;
@@ -74,19 +74,20 @@ router.get('/', (req, res) => {
             }
         }
 
-        // HSD Data
+        // HSD Data (Outstanding History)
         if (fs.existsSync(HSD_DATA_PATH)) {
             const hsdRaw = JSON.parse(fs.readFileSync(HSD_DATA_PATH, 'utf8'));
             let hsdArray = [];
-            if (Array.isArray(hsdRaw)) {
-                hsdArray = hsdRaw;
-            } else {
-                hsdArray = Object.keys(hsdRaw).map(date => ({
-                    date: date,
-                    ...hsdRaw[date]
-                }));
-            }
             
+            // Standardize into array of {date, ...fields}
+            Object.keys(hsdRaw).forEach(dateStr => {
+                const standardizedDate = toDDMMYYYY(dateStr); // Ensure dd/mm/yyyy
+                hsdArray.push({
+                    date: standardizedDate,
+                    ...hsdRaw[dateStr]
+                });
+            });
+
             const record = hsdArray.find(r => r.date === positionDate);
             const HSD_ORDER = ["IOC", "BPC", "HPC", "Retail", "Ramnad", "CNG"];
             const HSD_DISPLAY_NAMES = {
@@ -100,6 +101,7 @@ router.get('/', (req, res) => {
                 return { name: HSD_DISPLAY_NAMES[key], amount };
             });
 
+            // Calculate history up to positionDate
             hsdOutstandingHistory = hsdArray
                 .filter(r => ddmmyyyyToYmd(r.date) <= ddmmyyyyToYmd(positionDate))
                 .sort((a, b) => ddmmyyyyToYmd(a.date).localeCompare(ddmmyyyyToYmd(b.date)))
