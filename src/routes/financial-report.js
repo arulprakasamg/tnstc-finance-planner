@@ -55,11 +55,10 @@ router.get('/', (req, res) => {
             const master = banksMaster.find(b => b.accountName === name || b.bankName === name);
             let balance = 0;
             if (master) {
-                if (dailyBalances[positionDate] && dailyBalances[positionDate][master.id] !== undefined) {
-                    balance = Number(dailyBalances[positionDate][master.id]) || 0;
-                } else {
-                    const previousDate = availableDates.find(d => ddmmyyyyToYmd(d) <= ddmmyyyyToYmd(positionDate) && dailyBalances[d][master.id] !== undefined);
-                    if (previousDate) balance = Number(dailyBalances[previousDate][master.id]) || 0;
+                // Find most recent balance on or before positionDate
+                const effectiveDate = availableDates.find(d => ddmmyyyyToYmd(d) <= ddmmyyyyToYmd(positionDate) && dailyBalances[d][master.id] !== undefined);
+                if (effectiveDate) {
+                    balance = Number(dailyBalances[effectiveDate][master.id]) || 0;
                 }
             }
             totalBankBalance += balance;
@@ -88,6 +87,7 @@ router.get('/', (req, res) => {
                 });
             });
 
+            // Find specific record for current positionDate for HSD Payments Section
             const record = hsdArray.find(r => r.date === positionDate);
             const HSD_ORDER = ["IOC", "BPC", "HPC", "Retail", "Ramnad", "CNG"];
             const HSD_DISPLAY_NAMES = {
@@ -96,23 +96,26 @@ router.get('/', (req, res) => {
             };
 
             hsdPaymentsList = HSD_ORDER.map(key => {
-                const amount = record ? (record[key] || 0) : 0;
+                const amount = record ? (Number(record[key]) || 0) : 0;
                 hsdTotal += amount;
                 return { name: HSD_DISPLAY_NAMES[key], amount };
             });
+
+            // Reset grand totals before calculation
+            hsdGrandTotals = { IOC: 0, BPC: 0, HPC: 0, Retail: 0, Ramnad: 0, CNG: 0, Total: 0 };
 
             // Calculate history up to positionDate
             hsdOutstandingHistory = hsdArray
                 .filter(r => ddmmyyyyToYmd(r.date) <= ddmmyyyyToYmd(positionDate))
                 .sort((a, b) => ddmmyyyyToYmd(a.date).localeCompare(ddmmyyyyToYmd(b.date)))
                 .map(r => {
-                    const rowTotal = (r.IOC || 0) + (r.BPC || 0) + (r.HPC || 0) + (r.Retail || 0) + (r.Ramnad || 0) + (r.CNG || 0);
-                    hsdGrandTotals.IOC += (r.IOC || 0);
-                    hsdGrandTotals.BPC += (r.BPC || 0);
-                    hsdGrandTotals.HPC += (r.HPC || 0);
-                    hsdGrandTotals.Retail += (r.Retail || 0);
-                    hsdGrandTotals.Ramnad += (r.Ramnad || 0);
-                    hsdGrandTotals.CNG += (r.CNG || 0);
+                    const rowTotal = (Number(r.IOC) || 0) + (Number(r.BPC) || 0) + (Number(r.HPC) || 0) + (Number(r.Retail) || 0) + (Number(r.Ramnad) || 0) + (Number(r.CNG) || 0);
+                    hsdGrandTotals.IOC += (Number(r.IOC) || 0);
+                    hsdGrandTotals.BPC += (Number(r.BPC) || 0);
+                    hsdGrandTotals.HPC += (Number(r.HPC) || 0);
+                    hsdGrandTotals.Retail += (Number(r.Retail) || 0);
+                    hsdGrandTotals.Ramnad += (Number(r.Ramnad) || 0);
+                    hsdGrandTotals.CNG += (Number(r.CNG) || 0);
                     hsdGrandTotals.Total += rowTotal;
                     return { ...r, formattedDate: r.date, total: rowTotal };
                 });

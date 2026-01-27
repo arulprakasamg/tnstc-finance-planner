@@ -126,7 +126,13 @@
                         <div class="split-header">COLLECTION</div>
                         <div class="data-row" style="margin-bottom: 2rem;">
                             <span class="label">Collection Date :</span>
-                            <span class="value"><%= collectionInfo ? collectionInfo.toDate : '-' %></span>
+                            <span class="value">
+                                <% if (collectionInfo) { %>
+                                    <%= collectionInfo.fromDate %> – <%= collectionInfo.toDate %>
+                                <% } else { %>
+                                    -
+                                <% } %>
+                            </span>
                         </div>
                         
                         <div class="data-row">
