@@ -55,7 +55,7 @@ router.get('/', (req, res) => {
             const master = banksMaster.find(b => b.accountName === name || b.bankName === name);
             let balance = 0;
             if (master) {
-                // Find most recent balance on or before positionDate
+                // Find most recent balance on or before positionDate using master.id
                 const effectiveDate = availableDates.find(d => ddmmyyyyToYmd(d) <= ddmmyyyyToYmd(positionDate) && dailyBalances[d][master.id] !== undefined);
                 if (effectiveDate) {
                     balance = Number(dailyBalances[effectiveDate][master.id]) || 0;
@@ -109,15 +109,24 @@ router.get('/', (req, res) => {
                 .filter(r => ddmmyyyyToYmd(r.date) <= ddmmyyyyToYmd(positionDate))
                 .sort((a, b) => ddmmyyyyToYmd(a.date).localeCompare(ddmmyyyyToYmd(b.date)))
                 .map(r => {
-                    const rowTotal = (Number(r.IOC) || 0) + (Number(r.BPC) || 0) + (Number(r.HPC) || 0) + (Number(r.Retail) || 0) + (Number(r.Ramnad) || 0) + (Number(r.CNG) || 0);
-                    hsdGrandTotals.IOC += (Number(r.IOC) || 0);
-                    hsdGrandTotals.BPC += (Number(r.BPC) || 0);
-                    hsdGrandTotals.HPC += (Number(r.HPC) || 0);
-                    hsdGrandTotals.Retail += (Number(r.Retail) || 0);
-                    hsdGrandTotals.Ramnad += (Number(r.Ramnad) || 0);
-                    hsdGrandTotals.CNG += (Number(r.CNG) || 0);
+                    const rowIOC = Number(r.IOC) || 0;
+                    const rowBPC = Number(r.BPC) || 0;
+                    const rowHPC = Number(r.HPC) || 0;
+                    const rowRetail = Number(r.Retail) || 0;
+                    const rowRamnad = Number(r.Ramnad) || 0;
+                    const rowCNG = Number(r.CNG) || 0;
+                    
+                    const rowTotal = rowIOC + rowBPC + rowHPC + rowRetail + rowRamnad + rowCNG;
+                    
+                    hsdGrandTotals.IOC += rowIOC;
+                    hsdGrandTotals.BPC += rowBPC;
+                    hsdGrandTotals.HPC += rowHPC;
+                    hsdGrandTotals.Retail += rowRetail;
+                    hsdGrandTotals.Ramnad += rowRamnad;
+                    hsdGrandTotals.CNG += rowCNG;
                     hsdGrandTotals.Total += rowTotal;
-                    return { ...r, formattedDate: r.date, total: rowTotal };
+                    
+                    return { ...r, IOC: rowIOC, BPC: rowBPC, HPC: rowHPC, Retail: rowRetail, Ramnad: rowRamnad, CNG: rowCNG, formattedDate: r.date, total: rowTotal };
                 });
         }
 
