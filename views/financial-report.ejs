@@ -1,3 +1,17 @@
+<% 
+  // Local helpers for date conversion
+  const toInputDate = (dmy) => {
+    if (!dmy || !dmy.includes('/')) return dmy;
+    const [d, m, y] = dmy.split('/');
+    return `${y}-${m}-${d}`;
+  };
+
+  const toDisplayDate = (ymd) => {
+    if (!ymd || !ymd.includes('-')) return ymd;
+    const [y, m, d] = ymd.split('-');
+    return `${d}/${m}/${y}`;
+  };
+%>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -34,6 +48,7 @@
         .data-row.highlight { margin-top: 1.5rem; border-top: 1px solid #e2e8f0; padding-top: 1rem; }
         .data-row.highlight .value { font-size: 1.1rem; color: #1a3c5e; }
         .data-row.balance-row { border-top: 2px solid #1a3c5e; margin-top: 1rem; padding-top: 1rem; }
+        .data-row.balance-row .value { font-size: 1.1rem; color: #1a3c5e; }
     </style>
 </head>
 <body>
@@ -58,9 +73,18 @@
                 <h2>TNSTC KUMBAKONAM – FINANCE POSITION</h2>
             </div>
             <div class="date-selector-container">
-                <label for="positionDate">Position Date</label>
-                <input type="date" id="positionDate" value="<%= positionDate %>" onchange="window.location.href='/financial-report?positionDate='+this.value">
+                <label for="positionDateInput">Position Date</label>
+                <input type="date" id="positionDateInput" value="<%= toInputDate(positionDate) %>" onchange="handleDateChange(this.value)">
             </div>
+
+            <script>
+                function handleDateChange(ymd) {
+                    if (!ymd) return;
+                    const parts = ymd.split('-');
+                    const dmy = `${parts[2]}/${parts[1]}/${parts[0]}`;
+                    window.location.href = '/financial-report?positionDate=' + dmy;
+                }
+            </script>
 
             <!-- Bank Balances Section -->
             <section class="report-section">
