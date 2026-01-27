@@ -1,25 +1,25 @@
 {
-  "2026-01-24": {
-    "fromDate": "2026-01-23",
-    "toDate": "2026-01-23",
+  "24/01/2026": {
+    "fromDate": "23/01/2026",
+    "toDate": "23/01/2026",
     "grossCollection": 300,
     "batta": 33,
     "posCharges": 75,
     "netCollection": 192,
     "updatedAt": "2026-01-24T15:35:25.297Z"
   },
-  "2026-01-25": {
-    "fromDate": "2026-01-24",
-    "toDate": "2026-01-24",
+  "25/01/2026": {
+    "fromDate": "24/01/2026",
+    "toDate": "24/01/2026",
     "grossCollection": 400,
     "batta": 44,
     "posCharges": 80,
     "netCollection": 276,
     "updatedAt": "2026-01-25T06:25:39.143Z"
   },
-  "2026-01-27": {
-    "fromDate": "2026-01-26",
-    "toDate": "2026-01-26",
+  "27/01/2026": {
+    "fromDate": "26/01/2026",
+    "toDate": "26/01/2026",
     "grossCollection": 500,
     "batta": 55,
     "posCharges": 100,
