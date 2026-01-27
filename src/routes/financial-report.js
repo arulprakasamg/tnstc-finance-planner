@@ -79,11 +79,4 @@ router.get('/', (req, res) => {
     });
 });
 
-    res.render('financial-report', { 
-        today, positionDate, bankData, totalBankBalance,
-        collectionInfo, expenseInfo, otherPaymentsList,
-        hsdPaymentsList, hsdTotal, hsdOutstandingHistory, hsdGrandTotals
-    });
-});
-
 module.exports = router;
