@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const fs = require('fs');
 const path = require('path');
+const { toDDMMYYYY } = require('../utils/dateUtils');
 
 const PLANNING_DATA_PATH = path.join(__dirname, '../data/payment_planning.json');
 const MASTER_DATA_PATH = path.join(__dirname, '../data/bank_master.json');
@@ -19,8 +20,9 @@ const savePlanning = (data) => {
 router.get('/', (req, res) => {
     const planning = getPlanning();
     const banks = JSON.parse(fs.readFileSync(MASTER_DATA_PATH, 'utf8') || '[]');
-    const today = new Date().toISOString().split('T')[0];
-    const positionDate = req.query.positionDate || today;
+    const rawToday = new Date().toISOString().split('T')[0];
+    const today = toDDMMYYYY(rawToday);
+    const positionDate = req.query.positionDate ? toDDMMYYYY(req.query.positionDate) : today;
     const bankId = req.query.bankId || (banks.length > 0 ? banks[0].id : null);
     
     // Calculate Available Fund (Net Collection ONLY)
@@ -47,7 +49,8 @@ router.get('/', (req, res) => {
 });
 
 router.post('/save', (req, res) => {
-    const { positionDate, bankId, payments } = req.body;
+    let { positionDate, bankId, payments } = req.body;
+    positionDate = toDDMMYYYY(positionDate);
     const planning = getPlanning();
     
     if (!planning[positionDate]) planning[positionDate] = [];

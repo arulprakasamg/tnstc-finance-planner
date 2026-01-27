@@ -1,3 +1,17 @@
+<% 
+  // Local helpers for date conversion
+  const ddmmyyyyToYmd = (dmy) => {
+    if (!dmy || !dmy.includes('/')) return dmy;
+    const [d, m, y] = dmy.split('/');
+    return `${y}-${m}-${d}`;
+  };
+
+  const ymdToDdmmyyyy = (ymd) => {
+    if (!ymd || !ymd.includes('-')) return ymd;
+    const [y, m, d] = ymd.split('-');
+    return `${d}/${m}/${y}`;
+  };
+%>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -45,12 +59,12 @@
                     <h2>Planned Payment Entry</h2>
                     <div class="controls">
                         <label>Position Date:</label>
-                        <input type="date" id="posDate" value="<%= positionDate %>" onchange="window.location.href='/payment-planning?positionDate='+this.value">
+                        <input type="date" id="posDate" value="<%= ddmmyyyyToYmd(positionDate) %>" onchange="window.location.href='/payment-planning?positionDate='+this.value">
                     </div>
                 </div>
 
                 <form id="planningForm" class="planning-form">
-                    <input type="hidden" name="positionDate" value="<%= positionDate %>">
+                    <input type="hidden" name="positionDate" value="<%= ddmmyyyyToYmd(positionDate) %>">
                     <div class="form-group" style="margin-bottom: 2rem;">
                         <label>Bank Account *</label>
                         <select name="bankId" id="bankSelect" required style="width: 100%; padding: 0.8rem; border-radius: 6px;" onchange="window.location.href='/payment-planning?positionDate=' + document.getElementById('posDate').value + '&bankId=' + this.value">
