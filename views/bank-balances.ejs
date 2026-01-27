@@ -1,3 +1,17 @@
+<% 
+  // Local helpers for date conversion
+  const ddmmyyyyToYmd = (dmy) => {
+    if (!dmy || !dmy.includes('/')) return dmy;
+    const [d, m, y] = dmy.split('/');
+    return `${y}-${m}-${d}`;
+  };
+
+  const ymdToDdmmyyyy = (ymd) => {
+    if (!ymd || !ymd.includes('-')) return ymd;
+    const [y, m, d] = ymd.split('-');
+    return `${d}/${m}/${y}`;
+  };
+%>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -70,12 +84,12 @@
                 <h2>Bank Balance Entry</h2>
                 <div class="position-date-control">
                     <label for="entryPositionDate">Position Date:</label>
-                    <input type="date" id="entryPositionDate" value="<%= positionDate %>" onchange="changePositionDate(this.value)">
+                    <input type="date" id="entryPositionDate" value="<%= ddmmyyyyToYmd(positionDate) %>" onchange="changePositionDate(this.value)">
                 </div>
             </div>
 
             <form id="allBalancesForm" onsubmit="saveAllBalances(event)">
-                <input type="hidden" name="positionDate" value="<%= positionDate %>">
+                <input type="hidden" name="positionDate" value="<%= ddmmyyyyToYmd(positionDate) %>">
                 <div class="master-table-container">
                     <table class="master-table">
                         <thead>
@@ -158,7 +172,7 @@
     <form id="singleBalanceForm" action="/bank-balances/save-balance" method="POST" style="display:none;">
         <input type="hidden" name="bankId" id="singleBankId">
         <input type="hidden" name="balance" id="singleBalance">
-        <input type="hidden" name="positionDate" value="<%= positionDate %>">
+        <input type="hidden" name="positionDate" value="<%= ddmmyyyyToYmd(positionDate) %>">
     </form>
 
     <style>

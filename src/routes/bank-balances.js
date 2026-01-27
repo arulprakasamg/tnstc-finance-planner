@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const fs = require('fs');
 const path = require('path');
+const { toDDMMYYYY, ddmmyyyyToYmd } = require('../utils/dateUtils');
 
 const MASTER_DATA_PATH = path.join(__dirname, '../data/bank_master.json');
 
@@ -33,10 +34,14 @@ const saveDailyBalances = (data) => {
 router.get('/', (req, res) => {
     const banks = getMasterData();
     const dailyBalances = getDailyBalances();
-    const positionDate = req.query.positionDate || new Date().toISOString().split('T')[0];
+    const rawPositionDate = req.query.positionDate || new Date().toISOString().split('T')[0];
+    const positionDate = toDDMMYYYY(rawPositionDate);
     
     // Sort dates to find the most recent previous balance
-    const sortedDates = Object.keys(dailyBalances).sort().reverse();
+    // For dd/mm/yyyy keys, we need to convert to yyyy-mm-dd for proper sorting
+    const sortedDates = Object.keys(dailyBalances).sort((a, b) => {
+        return ddmmyyyyToYmd(b).localeCompare(ddmmyyyyToYmd(a));
+    });
 
     // Enrich banks with balance for the selected date or carry forward
     const enrichedBanks = banks.map(bank => {
@@ -50,7 +55,7 @@ router.get('/', (req, res) => {
             lastUpdated = positionDate;
         } else {
             // Find most recent previous balance
-            const previousDate = sortedDates.find(d => d < positionDate && dailyBalances[d][bank.id] !== undefined);
+            const previousDate = sortedDates.find(d => ddmmyyyyToYmd(d) < ddmmyyyyToYmd(positionDate) && dailyBalances[d][bank.id] !== undefined);
             if (previousDate) {
                 balance = dailyBalances[previousDate][bank.id];
                 isCarriedForward = true;
@@ -73,13 +78,14 @@ router.get('/', (req, res) => {
 router.post('/save-balance', (req, res) => {
     console.log('POST /save-balance body:', req.body);
     const body = req.body || {};
-    const { bankId, balance, positionDate } = body;
+    let { bankId, balance, positionDate } = body;
     
     if (!bankId || !positionDate) {
         console.error('Missing required fields for save-balance');
         return res.status(400).send('Bank ID and Position Date are required');
     }
 
+    positionDate = toDDMMYYYY(positionDate);
     const dailyBalances = getDailyBalances();
 
     if (!dailyBalances[positionDate]) {
@@ -89,24 +95,26 @@ router.post('/save-balance', (req, res) => {
     dailyBalances[positionDate][bankId] = parseFloat(balance) || 0;
     saveDailyBalances(dailyBalances);
     
+    const redirectUrl = `/bank-balances?positionDate=${ddmmyyyyToYmd(positionDate)}`;
     // For AJAX/JSON requests, send a 200 OK or a JSON response
     if (req.xhr || req.headers.accept.indexOf('json') > -1 || req.headers['content-type'] === 'application/json') {
-        return res.json({ success: true, redirect: `/bank-balances?positionDate=${positionDate}` });
+        return res.json({ success: true, redirect: redirectUrl });
     }
-    res.redirect(`/bank-balances?positionDate=${positionDate}`);
+    res.redirect(redirectUrl);
 });
 
 // Save all bank balances
 router.post('/save-all-balances', (req, res) => {
     console.log('POST /save-all-balances body:', req.body);
     const body = req.body || {};
-    const { balances = {}, positionDate } = body;
+    let { balances = {}, positionDate } = body;
 
     if (!positionDate) {
         console.error('Missing positionDate for save-all-balances');
         return res.status(400).send('Position Date is required');
     }
 
+    positionDate = toDDMMYYYY(positionDate);
     const dailyBalances = getDailyBalances();
 
     if (!dailyBalances[positionDate]) {
@@ -119,11 +127,12 @@ router.post('/save-all-balances', (req, res) => {
 
     saveDailyBalances(dailyBalances);
 
+    const redirectUrl = `/bank-balances?positionDate=${ddmmyyyyToYmd(positionDate)}`;
     // For AJAX/JSON requests
     if (req.xhr || req.headers.accept.indexOf('json') > -1 || req.headers['content-type'] === 'application/json') {
-        return res.json({ success: true, redirect: `/bank-balances?positionDate=${positionDate}` });
+        return res.json({ success: true, redirect: redirectUrl });
     }
-    res.redirect(`/bank-balances?positionDate=${positionDate}`);
+    res.redirect(redirectUrl);
 });
 
 // Create new bank master
