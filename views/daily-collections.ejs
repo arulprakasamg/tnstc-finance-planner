@@ -1,3 +1,17 @@
+<% 
+  // Local helpers for date conversion
+  const ddmmyyyyToYmd = (dmy) => {
+    if (!dmy || !dmy.includes('/')) return dmy;
+    const [d, m, y] = dmy.split('/');
+    return `${y}-${m}-${d}`;
+  };
+
+  const ymdToDdmmyyyy = (ymd) => {
+    if (!ymd || !ymd.includes('-')) return ymd;
+    const [y, m, d] = ymd.split('-');
+    return `${d}/${m}/${y}`;
+  };
+%>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -34,21 +48,21 @@
                     <h2>Collection Entry</h2>
                     <div class="position-date-control">
                         <label for="posDate">Position Date:</label>
-                        <input type="date" id="posDate" value="<%= positionDate %>" onchange="window.location.href='/daily-collections?positionDate='+this.value">
+                        <input type="date" id="posDate" value="<%= ddmmyyyyToYmd(positionDate) %>" onchange="window.location.href='/daily-collections?positionDate='+this.value">
                     </div>
                 </div>
 
                 <form id="collectionForm" class="collection-form">
-                    <input type="hidden" name="positionDate" value="<%= positionDate %>">
+                    <input type="hidden" name="positionDate" value="<%= ddmmyyyyToYmd(positionDate) %>">
                     
                     <div class="form-row">
                         <div class="form-group">
                             <label>From Date</label>
-                            <input type="date" name="fromDate" value="<%= entry.fromDate %>" required>
+                            <input type="date" name="fromDate" value="<%= ddmmyyyyToYmd(entry.fromDate) %>" required>
                         </div>
                         <div class="form-group">
                             <label>To Date</label>
-                            <input type="date" name="toDate" value="<%= entry.toDate %>" required>
+                            <input type="date" name="toDate" value="<%= ddmmyyyyToYmd(entry.toDate) %>" required>
                         </div>
                     </div>
 

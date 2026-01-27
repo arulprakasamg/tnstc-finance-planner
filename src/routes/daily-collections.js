@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const fs = require('fs');
 const path = require('path');
+const { toDDMMYYYY, ddmmyyyyToYmd } = require('../utils/dateUtils');
 
 const COLLECTIONS_DATA_PATH = path.join(__dirname, '../data/daily_collections.json');
 
@@ -36,11 +37,11 @@ const getYesterdayDate = () => {
 // Render Daily Collections Page
 router.get('/', (req, res) => {
     const collections = getCollections();
-    const today = getTodayDate();
-    const yesterday = getYesterdayDate();
+    const today = toDDMMYYYY(getTodayDate());
+    const yesterday = toDDMMYYYY(getYesterdayDate());
     
     // Default search/entry date to today
-    const positionDate = req.query.positionDate || today;
+    const positionDate = req.query.positionDate ? toDDMMYYYY(req.query.positionDate) : today;
     const entry = collections[positionDate] || {
         fromDate: yesterday,
         toDate: yesterday,
@@ -55,7 +56,17 @@ router.get('/', (req, res) => {
 
 // Save/Update Collection Entry
 router.post('/save', (req, res) => {
-    const { positionDate, fromDate, toDate, grossCollection, batta, posCharges, netCollection } = req.body;
+    let { positionDate, fromDate, toDate, grossCollection, batta, posCharges, netCollection } = req.body;
+    
+    // Convert all incoming yyyy-mm-dd to dd/mm/yyyy
+    positionDate = toDDMMYYYY(positionDate);
+    fromDate = toDDMMYYYY(fromDate);
+    toDate = toDDMMYYYY(toDate);
+
+    if (!positionDate) {
+        return res.status(400).json({ success: false, message: 'Invalid Position Date' });
+    }
+
     const collections = getCollections();
 
     collections[positionDate] = {
