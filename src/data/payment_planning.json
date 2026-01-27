@@ -135,5 +135,28 @@
       "bankId": "1",
       "updatedAt": "2026-01-25T03:37:14.223Z"
     }
+  ],
+  "27/01/2026": [
+    {
+      "category": "Oil Companies",
+      "subCategory": "IOC",
+      "amount": 100,
+      "bankId": "1",
+      "updatedAt": "2026-01-27T10:20:08.181Z"
+    },
+    {
+      "category": "Employee Related Payment 1 (Own Fund)",
+      "subCategory": "Officer TA-Bill",
+      "amount": 10,
+      "bankId": "1",
+      "updatedAt": "2026-01-27T10:20:08.181Z"
+    },
+    {
+      "category": "Other Payment",
+      "subCategory": "TDFC Interest / Repayment",
+      "amount": 10,
+      "bankId": "1",
+      "updatedAt": "2026-01-27T10:20:08.181Z"
+    }
   ]
 }

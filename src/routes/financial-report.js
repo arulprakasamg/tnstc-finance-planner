@@ -1,12 +1,13 @@
 const express = require('express');
 const router = express.Router();
-
 const fs = require('fs');
 const path = require('path');
+const { toDDMMYYYY, ddmmyyyyToYmd } = require('../utils/dateUtils');
 
 router.get('/', (req, res) => {
-    const today = new Date().toISOString().split('T')[0];
-    const positionDate = req.query.positionDate || today;
+    const rawToday = new Date().toISOString().split('T')[0];
+    const today = toDDMMYYYY(rawToday);
+    const positionDate = req.query.positionDate ? toDDMMYYYY(req.query.positionDate) : today;
 
     const MASTER_DATA_PATH = path.join(__dirname, '../data/bank_master.json');
     const BALANCES_DATA_PATH = path.join(__dirname, '../data/bank_balances_daily.json');
@@ -20,7 +21,7 @@ router.get('/', (req, res) => {
     ];
 
     const COLLECTIONS_PATH = path.join(__dirname, '../data/daily_collections.json');
-    const PAYMENTS_PATH = path.join(__dirname, '../data/planned_payments.json');
+    const PAYMENTS_PATH = path.join(__dirname, '../data/payment_planning.json');
     const HSD_DATA_PATH = path.join(__dirname, '../data/hsd_purchase.json');
 
     let bankData = [];
@@ -43,23 +44,27 @@ router.get('/', (req, res) => {
     try {
         const banksMaster = JSON.parse(fs.readFileSync(MASTER_DATA_PATH, 'utf8'));
         const dailyBalances = JSON.parse(fs.readFileSync(BALANCES_DATA_PATH, 'utf8'));
-        const availableDates = Object.keys(dailyBalances).sort();
+        
+        // Sort dates correctly for carry-forward logic
+        const availableDates = Object.keys(dailyBalances).sort((a, b) => {
+            return ddmmyyyyToYmd(b).localeCompare(ddmmyyyyToYmd(a));
+        });
 
-        // Sync bank balance logic with Dashboard API in index.js
+        // Bank Balance logic with Carry Forward
         bankData = BANK_ORDER.map(name => {
             const master = banksMaster.find(b => b.bankName === name);
             let balance = 0;
             if (master) {
-                // Find the latest balance on or before the selected Position Date
-                const effectiveDate = availableDates.slice().reverse().find(d => d <= positionDate && dailyBalances[d][master.id] !== undefined);
-                if (effectiveDate) balance = dailyBalances[effectiveDate][master.id];
+                if (dailyBalances[positionDate] && dailyBalances[positionDate][master.id] !== undefined) {
+                    balance = dailyBalances[positionDate][master.id];
+                } else {
+                    const previousDate = availableDates.find(d => ddmmyyyyToYmd(d) < ddmmyyyyToYmd(positionDate) && dailyBalances[d][master.id] !== undefined);
+                    if (previousDate) balance = dailyBalances[previousDate][master.id];
+                }
             }
             totalBankBalance += balance;
             return { name, balance };
         });
-        
-        console.log(`Financial Report Bank Data for ${positionDate}:`, JSON.stringify(bankData));
-        if (bankData.length === 0) console.warn('Financial Report: Bank data array is empty!');
 
         // Collection Data
         if (fs.existsSync(COLLECTIONS_PATH)) {
@@ -71,18 +76,22 @@ router.get('/', (req, res) => {
 
         // HSD Data
         if (fs.existsSync(HSD_DATA_PATH)) {
-            const hsdData = JSON.parse(fs.readFileSync(HSD_DATA_PATH, 'utf8'));
+            const hsdRaw = JSON.parse(fs.readFileSync(HSD_DATA_PATH, 'utf8'));
+            let hsdArray = [];
+            if (Array.isArray(hsdRaw)) {
+                hsdArray = hsdRaw;
+            } else {
+                hsdArray = Object.keys(hsdRaw).map(date => ({
+                    date: date,
+                    ...hsdRaw[date]
+                }));
+            }
             
-            // 1. Current day breakdown for payments column
-            const record = hsdData.find(r => r.date === positionDate);
+            const record = hsdArray.find(r => r.date === positionDate);
             const HSD_ORDER = ["IOC", "BPC", "HPC", "Retail", "Ramnad", "CNG"];
             const HSD_DISPLAY_NAMES = {
-                "IOC": "IOC",
-                "BPC": "BPC",
-                "HPC": "HPC",
-                "Retail": "Retail / Confed",
-                "Ramnad": "Ramnad",
-                "CNG": "CNG"
+                "IOC": "IOC", "BPC": "BPC", "HPC": "HPC",
+                "Retail": "Retail / Confed", "Ramnad": "Ramnad", "CNG": "CNG"
             };
 
             hsdPaymentsList = HSD_ORDER.map(key => {
@@ -91,13 +100,11 @@ router.get('/', (req, res) => {
                 return { name: HSD_DISPLAY_NAMES[key], amount };
             });
 
-            // 2. Historical outstanding up to positionDate
-            hsdOutstandingHistory = hsdData
-                .filter(r => r.date <= positionDate)
-                .sort((a, b) => new Date(a.date) - new Date(b.date))
+            hsdOutstandingHistory = hsdArray
+                .filter(r => ddmmyyyyToYmd(r.date) <= ddmmyyyyToYmd(positionDate))
+                .sort((a, b) => ddmmyyyyToYmd(a.date).localeCompare(ddmmyyyyToYmd(b.date)))
                 .map(r => {
                     const rowTotal = (r.IOC || 0) + (r.BPC || 0) + (r.HPC || 0) + (r.Retail || 0) + (r.Ramnad || 0) + (r.CNG || 0);
-                    
                     hsdGrandTotals.IOC += (r.IOC || 0);
                     hsdGrandTotals.BPC += (r.BPC || 0);
                     hsdGrandTotals.HPC += (r.HPC || 0);
@@ -105,45 +112,24 @@ router.get('/', (req, res) => {
                     hsdGrandTotals.Ramnad += (r.Ramnad || 0);
                     hsdGrandTotals.CNG += (r.CNG || 0);
                     hsdGrandTotals.Total += rowTotal;
-
-                    const [y, m, d] = r.date.split('-');
-                    return {
-                        ...r,
-                        formattedDate: `${d}/${m}/${y}`,
-                        total: rowTotal
-                    };
+                    return { ...r, formattedDate: r.date, total: rowTotal };
                 });
         }
 
-        // Expense Data
+        // Expense Data (Planned Payments)
         if (fs.existsSync(PAYMENTS_PATH)) {
-            const payments = JSON.parse(fs.readFileSync(PAYMENTS_PATH, 'utf8'));
-            if (payments[positionDate]) {
-                const dayPayments = payments[positionDate];
-                
-                // Get all payments across all banks for this day
-                const allPayments = [];
-                Object.keys(dayPayments).forEach(bankId => {
-                    dayPayments[bankId].forEach(p => {
-                        allPayments.push(p);
-                    });
-                });
-
-                allPayments.forEach(p => {
+            const planning = JSON.parse(fs.readFileSync(PAYMENTS_PATH, 'utf8'));
+            if (planning[positionDate]) {
+                planning[positionDate].forEach(p => {
                     if (p.category === 'Oil Companies') {
                         expenseInfo.oilExp += p.amount;
                     } else {
                         expenseInfo.otherExp += p.amount;
-                        // For Other Payments, we want to keep them in order of appearance
                         const existing = otherPaymentsList.find(item => item.subCategory === p.subCategory);
-                        if (existing) {
-                            existing.amount += p.amount;
-                        } else {
-                            otherPaymentsList.push({ subCategory: p.subCategory, amount: p.amount });
-                        }
+                        if (existing) { existing.amount += p.amount; }
+                        else { otherPaymentsList.push({ subCategory: p.subCategory, amount: p.amount }); }
                     }
                 });
-                
                 expenseInfo.totalExp = expenseInfo.oilExp + expenseInfo.otherExp;
                 if (collectionInfo) {
                     expenseInfo.balance = collectionInfo.netCollection - expenseInfo.totalExp;
@@ -155,17 +141,9 @@ router.get('/', (req, res) => {
     }
 
     res.render('financial-report', { 
-        today, 
-        positionDate, 
-        bankData, 
-        totalBankBalance,
-        collectionInfo,
-        expenseInfo,
-        otherPaymentsList,
-        hsdPaymentsList,
-        hsdTotal,
-        hsdOutstandingHistory,
-        hsdGrandTotals
+        today, positionDate, bankData, totalBankBalance,
+        collectionInfo, expenseInfo, otherPaymentsList,
+        hsdPaymentsList, hsdTotal, hsdOutstandingHistory, hsdGrandTotals
     });
 });
 
