@@ -58,7 +58,7 @@ router.get('/', (req, res) => {
                 if (dailyBalances[positionDate] && dailyBalances[positionDate][master.id] !== undefined) {
                     balance = Number(dailyBalances[positionDate][master.id]) || 0;
                 } else {
-                    const previousDate = availableDates.find(d => ddmmyyyyToYmd(d) < ddmmyyyyToYmd(positionDate) && dailyBalances[d][master.id] !== undefined);
+                    const previousDate = availableDates.find(d => ddmmyyyyToYmd(d) <= ddmmyyyyToYmd(positionDate) && dailyBalances[d][master.id] !== undefined);
                     if (previousDate) balance = Number(dailyBalances[previousDate][master.id]) || 0;
                 }
             }

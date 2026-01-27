@@ -4,9 +4,11 @@ const router = express.Router();
 const fs = require('fs');
 const path = require('path');
 
-// Helper to get today's date string
+const { toDDMMYYYY, ddmmyyyyToYmd } = require('../utils/dateUtils');
+
+// Helper to get today's date string in dd/mm/yyyy
 const getTodayDate = () => {
-    return new Date().toISOString().split('T')[0];
+    return toDDMMYYYY(new Date().toISOString().split('T')[0]);
 };
 
 // Required Display Order for Banks
@@ -23,31 +25,31 @@ const BALANCES_DATA_PATH = path.join(__dirname, '../data/bank_balances_daily.jso
 
 // Dashboard Page
 router.get('/', (req, res) => {
-    const dashboardMetrics = require('../data/dashboard_metrics.json');
     const today = getTodayDate();
     
-    // Default to today if not provided
-    const fromDate = req.query.fromDate || today;
-    const toDate = req.query.toDate || today;
+    // Position Date logic: handle yyyy-mm-dd from query and convert to dd/mm/yyyy
+    let positionDate = req.query.toDate ? toDDMMYYYY(req.query.toDate) : today;
+    const fromDateInput = req.query.fromDate || ddmmyyyyToYmd(positionDate);
+    const toDateInput = req.query.toDate || ddmmyyyyToYmd(positionDate);
     
     // Read live data
     const banksMaster = JSON.parse(fs.readFileSync(MASTER_DATA_PATH, 'utf8'));
     const dailyBalances = JSON.parse(fs.readFileSync(BALANCES_DATA_PATH, 'utf8'));
     
-    // Sort dates to find the latest balance on or before toDate
-    const availableDates = Object.keys(dailyBalances).sort();
+    // Sort dates to find the latest balance on or before positionDate
+    const availableDates = Object.keys(dailyBalances).sort((a, b) => ddmmyyyyToYmd(a).localeCompare(ddmmyyyyToYmd(b)));
 
     // Calculate live bank balances using rolling logic
     let totalLiveBankBalance = 0;
     const liveBankBreakdown = BANK_ORDER.map(bankName => {
-        const bankInfo = banksMaster.find(b => b.bankName === bankName);
+        const bankInfo = banksMaster.find(b => b.bankName === bankName || b.accountName === bankName);
         let balance = 0;
         
         if (bankInfo) {
-            // Find most recent balance on or before toDate
-            const effectiveDate = availableDates.slice().reverse().find(d => d <= toDate && dailyBalances[d][bankInfo.id] !== undefined);
+            // Find most recent balance on or before positionDate
+            const effectiveDate = availableDates.slice().reverse().find(d => ddmmyyyyToYmd(d) <= ddmmyyyyToYmd(positionDate) && dailyBalances[d][bankInfo.id] !== undefined);
             if (effectiveDate) {
-                balance = dailyBalances[effectiveDate][bankInfo.id];
+                balance = Number(dailyBalances[effectiveDate][bankInfo.id]) || 0;
             }
         }
         
@@ -55,28 +57,25 @@ router.get('/', (req, res) => {
         return { name: bankName, balance: balance };
     });
     
-    // Calculate collection for date range
+    // Calculate collection for selected positionDate
     const collectionsDataPath = path.join(__dirname, '../data/daily_collections.json');
-    let totalNetCollection = 0;
-    let totalGrossCollection = 0;
-    let totalBatta = 0;
-    let totalPos = 0;
+    let netCollection = 0;
+    let grossCollection = 0;
+    let batta = 0;
+    let pos = 0;
+    let collFromDate = "";
+    let collToDate = "";
 
     try {
         if (fs.existsSync(collectionsDataPath)) {
             const collections = JSON.parse(fs.readFileSync(collectionsDataPath, 'utf8'));
-            const start = new Date(fromDate);
-            const end = new Date(toDate);
-            
-            // Loop through dates in range and sum collection components
-            for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
-                const dateStr = d.toISOString().split('T')[0];
-                if (collections[dateStr]) {
-                    totalNetCollection += collections[dateStr].netCollection || 0;
-                    totalGrossCollection += collections[dateStr].grossCollection || 0;
-                    totalBatta += collections[dateStr].batta || 0;
-                    totalPos += collections[dateStr].posCharges || 0;
-                }
+            if (collections[positionDate]) {
+                netCollection = collections[positionDate].netCollection || 0;
+                grossCollection = collections[positionDate].grossCollection || 0;
+                batta = collections[positionDate].batta || 0;
+                pos = collections[positionDate].posCharges || 0;
+                collFromDate = collections[positionDate].fromDate;
+                collToDate = collections[positionDate].toDate;
             }
         }
     } catch (err) {
@@ -108,14 +107,16 @@ router.get('/', (req, res) => {
     const data = {
         bankBalance: totalLiveBankBalance,
         bankBreakdown: liveBankBreakdown,
-        collection: totalNetCollection,
-        collectionGross: totalGrossCollection,
-        collectionBatta: totalBatta,
-        collectionPos: totalPos,
+        collection: netCollection,
+        collectionGross: grossCollection,
+        collectionBatta: batta,
+        collectionPos: pos,
         hsdOutstanding: hsdTotal,
         hsdBreakdown: hsdCompanyWise,
-        fromDate,
-        toDate
+        fromDate: fromDateInput,
+        toDate: toDateInput,
+        collFromDate: collFromDate,
+        collToDate: collToDate
     };
     
     res.render('index', { data });

@@ -75,10 +75,10 @@
                     <h3>Collection</h3>
                     <p class="amount">₹<%= data.collectionGross.toLocaleString('en-IN', { minimumFractionDigits: 2 }) %></p>
                     <p class="card-date-info">
-                        <% if (data.fromDate === data.toDate) { %>
-                            <%= formatDate(data.fromDate) %>
+                        <% if (data.collFromDate && data.collToDate) { %>
+                            <%= data.collFromDate %> – <%= data.collToDate %>
                         <% } else { %>
-                            <%= formatDate(data.fromDate) %> – <%= formatDate(data.toDate) %>
+                            No Collection Data
                         <% } %>
                     </p>
                 </div>
