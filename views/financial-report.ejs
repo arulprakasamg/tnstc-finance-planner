@@ -49,6 +49,26 @@
         .data-row.highlight .value { font-size: 1.1rem; color: #1a3c5e; }
         .data-row.balance-row { border-top: 2px solid #1a3c5e; margin-top: 1rem; padding-top: 1rem; }
         .data-row.balance-row .value { font-size: 1.1rem; color: #1a3c5e; }
+
+        .print-button-container { display: flex; justify-content: flex-end; margin-bottom: 1.5rem; }
+        .print-button { background: #1a3c5e; color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 6px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: background 0.3s ease; }
+        .print-button:hover { background: #0f2540; }
+
+        @media print {
+            .sidebar { display: none !important; }
+            .print-button-container { display: none !important; }
+            .main-content { margin-left: 0 !important; width: 100%; }
+            body { background: white; }
+            .container { max-width: 100%; margin: 0; padding: 0.5rem; }
+            .report-section { page-break-inside: avoid; margin-top: 2rem; }
+            .split-section { page-break-inside: avoid; }
+            .horizontal-table { page-break-inside: avoid; }
+            table { border-collapse: collapse; width: 100%; }
+            thead { display: table-header-group; }
+            tfoot { display: table-footer-group; }
+            tr { page-break-inside: avoid; }
+            * { box-shadow: none !important; }
+        }
     </style>
 </head>
 <body>
@@ -69,6 +89,9 @@
             <p class="date-range">Finance Position Analysis</p>
         </header>
         <main class="container">
+            <div class="print-button-container">
+                <button class="print-button" onclick="window.print()">Print Report</button>
+            </div>
             <div class="report-header">
                 <h2>TNSTC KUMBAKONAM – FINANCE POSITION</h2>
             </div>
