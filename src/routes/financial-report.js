@@ -3,7 +3,7 @@ const router = express.Router();
 const fs = require('fs');
 const path = require('path');
 const { toDDMMYYYY, ddmmyyyyToYmd } = require('../utils/dateUtils');
-const { getFinancePosition } = require('../utils/financeUtils');
+const { getFinancePosition, getHSDOutstanding } = require('../utils/financeUtils');
 
 router.get('/', (req, res) => {
     const rawToday = new Date().toISOString().split('T')[0];
@@ -11,6 +11,7 @@ router.get('/', (req, res) => {
     const positionDate = req.query.positionDate ? toDDMMYYYY(req.query.positionDate) : today;
 
     const financePos = getFinancePosition(positionDate);
+    const hsdOutstandingPayments = getHSDOutstanding();
 
     // Map financePos to existing view variables for compatibility
     const bankData = financePos.bankBreakdown;
@@ -75,7 +76,8 @@ router.get('/', (req, res) => {
     res.render('financial-report', { 
         today, positionDate, bankData, totalBankBalance,
         collectionInfo, expenseInfo, otherPaymentsList,
-        hsdPaymentsList, hsdTotal, hsdOutstandingHistory, hsdGrandTotals
+        hsdPaymentsList, hsdTotal, hsdOutstandingHistory, hsdGrandTotals,
+        hsdOutstandingPayments
     });
 });
 

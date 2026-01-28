@@ -111,4 +111,53 @@ function getFinancePosition(positionDate) {
     return result;
 }
 
-module.exports = { getFinancePosition };
+/**
+ * Gets HSD Outstanding payments aggregated from payment_planning.json
+ * @returns {Array} Sorted by date ascending
+ */
+function getHSDOutstanding() {
+    const results = [];
+    try {
+        if (fs.existsSync(PAYMENTS_PATH)) {
+            const planning = JSON.parse(fs.readFileSync(PAYMENTS_PATH, 'utf8'));
+            const dates = Object.keys(planning).sort((a, b) => ddmmyyyyToYmd(a).localeCompare(ddmmyyyyToYmd(b)));
+
+            dates.forEach(date => {
+                const dayPayments = planning[date];
+                const hsdEntry = {
+                    date: date,
+                    IOC: 0,
+                    BPC: 0,
+                    HPC: 0,
+                    'Retail / Confed': 0,
+                    Ramnad: 0,
+                    CNG: 0,
+                    total: 0
+                };
+
+                let hasHSD = false;
+                dayPayments.forEach(p => {
+                    if (p.category === 'Oil Companies') {
+                        hasHSD = true;
+                        const subCat = p.subCategory;
+                        if (hsdEntry.hasOwnProperty(subCat)) {
+                            hsdEntry[subCat] += Number(p.amount) || 0;
+                        } else if (subCat === 'Retail' || subCat === 'Retail / Confed') {
+                             hsdEntry['Retail / Confed'] += Number(p.amount) || 0;
+                        }
+                        hsdEntry.total += Number(p.amount) || 0;
+                    }
+                });
+
+                if (hasHSD) {
+                    results.push(hsdEntry);
+                }
+            });
+        }
+    } catch (err) {
+        console.error('getHSDOutstanding Error:', err);
+    }
+    return results;
+}
+
+module.exports = { getFinancePosition, getHSDOutstanding };
