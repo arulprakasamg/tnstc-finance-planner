@@ -58,7 +58,7 @@ router.get('/', (req, res) => {
         });
     }
 
-    // Prepare hsdOutstandingHistory (Cumulative purchase outstanding)
+    // Prepare hsdOutstandingHistory (Date-wise purchase outstanding)
     let hsdOutstandingHistory = financePos.hsdOutstandingHistory || [];
     let hsdGrandTotals = financePos.hsdOutstanding;
 
