@@ -40,10 +40,14 @@ function getFinancePosition(positionDate) {
         const BANK_ORDER = ["SBI – PLATINUM", "IOB – 5555", "I.B", "IOB – 42300", "IOB – 142300"];
         
         result.bankBreakdown = BANK_ORDER.map(name => {
-            const master = banksMaster.find(b => b.accountName === name || b.bankName === name);
+            const master = banksMaster.find(b => 
+                b.accountName.toLowerCase().includes(name.split(' – ')[0].toLowerCase()) || 
+                b.bankName.toLowerCase().includes(name.toLowerCase()) ||
+                (b.accountName.toLowerCase().includes("sbi") && name.toLowerCase().includes("sbi")) ||
+                (b.accountName.toLowerCase().includes("iob") && name.toLowerCase().includes(name.split(" – ")[1]?.toLowerCase() || "none"))
+            );
             let balance = 0;
             if (master) {
-                // Find most recent balance on or before positionDate
                 const effectiveDate = availableDates.find(d => ddmmyyyyToYmd(d) <= ddmmyyyyToYmd(positionDate) && dailyBalances[d][master.id] !== undefined);
                 if (effectiveDate) {
                     balance = Number(dailyBalances[effectiveDate][master.id]) || 0;
