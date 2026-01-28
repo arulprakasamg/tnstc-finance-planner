@@ -77,7 +77,7 @@ router.get('/', (req, res) => {
         today, positionDate, bankData, totalBankBalance,
         collectionInfo, expenseInfo, otherPaymentsList,
         hsdPaymentsList, hsdTotal, hsdOutstandingHistory, hsdGrandTotals,
-        hsdOutstandingPayments
+        hsdOutstandingPayments, hsdOutstanding: hsdOutstandingPayments
     });
 });
 
