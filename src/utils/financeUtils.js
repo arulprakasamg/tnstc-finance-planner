@@ -36,25 +36,20 @@ function getFinancePosition(positionDate) {
         const dailyBalances = JSON.parse(fs.readFileSync(BALANCES_DATA_PATH, 'utf8'));
         const availableDates = Object.keys(dailyBalances).sort((a, b) => ddmmyyyyToYmd(b).localeCompare(ddmmyyyyToYmd(a)));
 
-        // 1. Opening Balance (Previous available balance before positionDate)
-        const BANK_ORDER = ["SBI – PLATINUM", "IOB – 5555", "I.B", "IOB – 42300", "IOB – 142300"];
-        
-        result.bankBreakdown = BANK_ORDER.map(name => {
-            const master = banksMaster.find(b => 
-                b.accountName.toLowerCase().includes(name.split(' – ')[0].toLowerCase()) || 
-                b.bankName.toLowerCase().includes(name.toLowerCase()) ||
-                (b.accountName.toLowerCase().includes("sbi") && name.toLowerCase().includes("sbi")) ||
-                (b.accountName.toLowerCase().includes("iob") && name.toLowerCase().includes(name.split(" – ")[1]?.toLowerCase() || "none"))
-            );
+        // 1. Opening Balance (Direct ID-based lookup from daily bank balance entry)
+        const bankIds = banksMaster.map(b => b.id);
+
+        result.bankBreakdown = bankIds.map(bankId => {
+            const master = banksMaster.find(b => b.id === bankId);
             let balance = 0;
             if (master) {
-                const effectiveDate = availableDates.find(d => ddmmyyyyToYmd(d) <= ddmmyyyyToYmd(positionDate) && dailyBalances[d][master.id] !== undefined);
+                const effectiveDate = availableDates.find(d => ddmmyyyyToYmd(d) <= ddmmyyyyToYmd(positionDate) && dailyBalances[d][bankId] !== undefined);
                 if (effectiveDate) {
-                    balance = Number(dailyBalances[effectiveDate][master.id]) || 0;
+                    balance = Number(dailyBalances[effectiveDate][bankId]) || 0;
                 }
             }
             result.openingBalance += balance;
-            return { name, balance };
+            return { id: bankId, name: master.accountName, balance };
         });
 
         // 2. Net Collection
@@ -193,4 +188,15 @@ function getHSDOutstanding() {
     return results;
 }
 
-module.exports = { getFinancePosition, getHSDOutstanding };
+/**
+ * Formats bank balance value to Crore display format
+ * @param {number} valueInCrore - Bank balance in Crores
+ * @returns {string} Formatted string like "₹12.19 Crore"
+ */
+function formatBankBalance(valueInCrore) {
+    const num = Number(valueInCrore) || 0;
+    const formatted = num.toFixed(2);
+    return `₹${formatted} Crore`;
+}
+
+module.exports = { getFinancePosition, getHSDOutstanding, formatBankBalance };

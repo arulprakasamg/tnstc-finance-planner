@@ -55,7 +55,7 @@
             <div class="card card-balance">
                 <div class="card-main">
                     <h3>Bank Balance</h3>
-                    <p class="amount">₹<%= data.bankBalance.toLocaleString('en-IN', { minimumFractionDigits: 2 }) %> Crore</p>
+                    <p class="amount"><%= data.bankBalanceFormatted %></p>
                 </div>
                 <div class="card-breakdown">
                     <ul class="bank-list">
