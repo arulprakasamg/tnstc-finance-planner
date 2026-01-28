@@ -1,4 +1,4 @@
- {
+{
   "24/01/2026": [
     {
       "category": "Oil Companies",
@@ -157,6 +157,57 @@
       "amount": 10,
       "bankId": "1",
       "updatedAt": "2026-01-27T12:16:30.244Z"
+    }
+  ],
+  "28/01/2026": [
+    {
+      "category": "Region Fund",
+      "subCategory": "MV Tax",
+      "amount": 30,
+      "bankId": "1",
+      "updatedAt": "2026-01-28T09:38:39.271Z"
+    },
+    {
+      "category": "Region Fund",
+      "subCategory": "EB",
+      "amount": 25,
+      "bankId": "1",
+      "updatedAt": "2026-01-28T09:38:39.271Z"
+    },
+    {
+      "category": "Employee Related Payment 1 (Own Fund)",
+      "subCategory": "Interest (EL, PF, CPS, Gratuity)",
+      "amount": 243,
+      "bankId": "1",
+      "updatedAt": "2026-01-28T09:38:39.271Z"
+    },
+    {
+      "category": "Other Payment",
+      "subCategory": "TDFC Interest / Repayment",
+      "amount": 200,
+      "bankId": "1",
+      "updatedAt": "2026-01-28T09:38:39.271Z"
+    },
+    {
+      "category": "Other Payment",
+      "subCategory": "Material",
+      "amount": 30,
+      "bankId": "1",
+      "updatedAt": "2026-01-28T09:38:39.271Z"
+    },
+    {
+      "category": "Other Payment",
+      "subCategory": "Cess / Toll",
+      "amount": 130,
+      "bankId": "1",
+      "updatedAt": "2026-01-28T09:38:39.271Z"
+    },
+    {
+      "category": "Other Payment",
+      "subCategory": "MCOP",
+      "amount": 40,
+      "bankId": "1",
+      "updatedAt": "2026-01-28T09:38:39.271Z"
     }
   ]
 }

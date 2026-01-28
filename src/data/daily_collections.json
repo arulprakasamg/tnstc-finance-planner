@@ -25,5 +25,14 @@
     "posCharges": 100,
     "netCollection": 345,
     "updatedAt": "2026-01-27T07:14:31.338Z"
+  },
+  "28/01/2026": {
+    "fromDate": "24/01/2026",
+    "toDate": "27/01/2026",
+    "grossCollection": 2052.48,
+    "batta": 225.77,
+    "posCharges": 182.23,
+    "netCollection": 1644.48,
+    "updatedAt": "2026-01-28T09:37:14.916Z"
   }
 }
