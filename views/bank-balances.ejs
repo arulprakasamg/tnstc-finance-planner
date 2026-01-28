@@ -80,7 +80,10 @@
         <!-- Bank Balance Entry Section -->
         <section class="balance-entry-section" style="margin-top: 3rem;">
             <div class="section-header">
-                <h2>Bank Balance Entry</h2>
+                <div>
+                    <h2>Bank Balance Entry</h2>
+                    <p style="font-size: 0.85rem; color: #64748b; margin-top: 0.25rem;">Please enter Balance in Crore (Example: 0.01 = 1 lakh, 1.00 = 1 crore)</p>
+                </div>
                 <div class="position-date-control">
                     <label for="entryPositionDate">Position Date:</label>
                     <input type="date" id="entryPositionDate" value="<%= ddmmyyyyToYmd(positionDate) %>" onchange="changePositionDate(this.value)">

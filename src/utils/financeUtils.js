@@ -83,8 +83,9 @@ function getFinancePosition(positionDate) {
             }
         }
 
-        // 5. Closing Balance (Note: Opening Balance is in Crores, need to convert to Lakhs for consistency)
-        // Rule: Opening (Crores) * 100 = Opening (Lakhs)
+        // 5. Closing Balance (Note: Opening Balance and Net Collection/Payments need to be on same scale)
+        // Rule: Both are already in their respective units (Crores and Lakhs). 
+        // To calculate closing balance in Lakhs: Opening (Crores) * 100 = Opening (Lakhs)
         const openingInLakhs = result.openingBalance * 100;
         result.closingBalance = openingInLakhs + result.netCollection - result.payments.total;
 

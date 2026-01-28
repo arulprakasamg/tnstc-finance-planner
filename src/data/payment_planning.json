@@ -161,53 +161,95 @@
   ],
   "28/01/2026": [
     {
+      "category": "Oil Companies",
+      "subCategory": "IOC",
+      "amount": 1094.35,
+      "bankId": "1",
+      "updatedAt": "2026-01-28T10:24:05.501Z"
+    },
+    {
+      "category": "Oil Companies",
+      "subCategory": "BPC",
+      "amount": 185.22,
+      "bankId": "1",
+      "updatedAt": "2026-01-28T10:24:05.501Z"
+    },
+    {
+      "category": "Oil Companies",
+      "subCategory": "HPC",
+      "amount": 32.64,
+      "bankId": "1",
+      "updatedAt": "2026-01-28T10:24:05.501Z"
+    },
+    {
+      "category": "Oil Companies",
+      "subCategory": "Retail / Confed",
+      "amount": 9,
+      "bankId": "1",
+      "updatedAt": "2026-01-28T10:24:05.501Z"
+    },
+    {
+      "category": "Oil Companies",
+      "subCategory": "Ramnad",
+      "amount": 14,
+      "bankId": "1",
+      "updatedAt": "2026-01-28T10:24:05.501Z"
+    },
+    {
+      "category": "Oil Companies",
+      "subCategory": "CNG",
+      "amount": 3,
+      "bankId": "1",
+      "updatedAt": "2026-01-28T10:24:05.501Z"
+    },
+    {
       "category": "Region Fund",
       "subCategory": "MV Tax",
       "amount": 30,
       "bankId": "1",
-      "updatedAt": "2026-01-28T09:38:39.271Z"
+      "updatedAt": "2026-01-28T10:24:05.501Z"
     },
     {
       "category": "Region Fund",
       "subCategory": "EB",
       "amount": 25,
       "bankId": "1",
-      "updatedAt": "2026-01-28T09:38:39.271Z"
+      "updatedAt": "2026-01-28T10:24:05.501Z"
     },
     {
       "category": "Employee Related Payment 1 (Own Fund)",
       "subCategory": "Interest (EL, PF, CPS, Gratuity)",
       "amount": 243,
       "bankId": "1",
-      "updatedAt": "2026-01-28T09:38:39.271Z"
+      "updatedAt": "2026-01-28T10:24:05.501Z"
     },
     {
       "category": "Other Payment",
       "subCategory": "TDFC Interest / Repayment",
       "amount": 200,
       "bankId": "1",
-      "updatedAt": "2026-01-28T09:38:39.271Z"
+      "updatedAt": "2026-01-28T10:24:05.501Z"
     },
     {
       "category": "Other Payment",
       "subCategory": "Material",
       "amount": 30,
       "bankId": "1",
-      "updatedAt": "2026-01-28T09:38:39.271Z"
+      "updatedAt": "2026-01-28T10:24:05.501Z"
     },
     {
       "category": "Other Payment",
       "subCategory": "Cess / Toll",
       "amount": 130,
       "bankId": "1",
-      "updatedAt": "2026-01-28T09:38:39.271Z"
+      "updatedAt": "2026-01-28T10:24:05.501Z"
     },
     {
       "category": "Other Payment",
       "subCategory": "MCOP",
       "amount": 40,
       "bankId": "1",
-      "updatedAt": "2026-01-28T09:38:39.271Z"
+      "updatedAt": "2026-01-28T10:24:05.501Z"
     }
   ]
 }

@@ -105,13 +105,13 @@
                         <tr>
                             <td>Balance</td>
                             <% bankData.forEach(bank => { %>
-                                <td><%= (bank.balance / 10000000).toFixed(2) %></td>
+                                <td><%= Number(bank.balance).toFixed(2) %></td>
                             <% }) %>
                         </tr>
                     </tbody>
                 </table>
                 <div class="grand-total">
-                    Total : <%= (totalBankBalance / 10000000).toFixed(2) %>
+                    Total : <%= Number(totalBankBalance).toFixed(2) %>
                 </div>
             </section>
 
