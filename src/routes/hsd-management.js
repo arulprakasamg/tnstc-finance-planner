@@ -62,7 +62,16 @@ router.post('/save', (req, res) => {
     const { date, companies } = req.body;
     const data = getHsdData();
     
-    const entry = {};
+    // Explicitly overwrite the entire entry for this date
+    const entry = {
+        IOC: 0,
+        BPC: 0,
+        HPC: 0,
+        Retail: 0,
+        Ramnad: 0,
+        CNG: 0
+    };
+    
     let hasValue = false;
     for (const [co, val] of Object.entries(companies)) {
         const num = parseFloat(val) || 0;
@@ -73,11 +82,6 @@ router.post('/save', (req, res) => {
     }
     
     if (hasValue) {
-        // Special case: field name in UI is "Retail" but table column is "Retail"
-        // The data-cat in payment planning used "Retail / Confed"
-        // Let's ensure we map the keys correctly if needed, but for now 
-        // the form sends names like "IOC", "BPC", "HPC", "Retail", "Ramnad", "CNG"
-        // and the table expects these keys.
         data[date] = entry;
         saveHsdData(data);
         res.json({ success: true });
@@ -88,10 +92,16 @@ router.post('/save', (req, res) => {
 
 router.post('/delete', (req, res) => {
     const { date } = req.body;
+    if (!date) return res.status(400).json({ error: 'Date is required' });
+    
     const data = getHsdData();
-    delete data[date];
-    saveHsdData(data);
-    res.json({ success: true });
+    if (data.hasOwnProperty(date)) {
+        delete data[date];
+        saveHsdData(data);
+        res.json({ success: true });
+    } else {
+        res.json({ success: true, message: 'Date not found, nothing to delete' });
+    }
 });
 
 module.exports = router;
