@@ -78,9 +78,9 @@
             .horizontal-table th, .horizontal-table td { padding: 6px 6px; font-size: 0.7rem; }
             .report-section:nth-child(1) .horizontal-table th:first-child, .report-section:nth-child(1) .horizontal-table td:first-child { width: 12%; }
             .report-section:nth-child(1) .horizontal-table th:not(:first-child), .report-section:nth-child(1) .horizontal-table td:not(:first-child) { width: calc((100% - 12%) / (9 - 1)); }
-            .report-section:nth-child(4) .horizontal-table th:first-child, .report-section:nth-child(4) .horizontal-table td:first-child { width: 8%; }
-            .report-section:nth-child(4) .horizontal-table th:nth-child(2), .report-section:nth-child(4) .horizontal-table td:nth-child(2) { width: 12%; }
-            .report-section:nth-child(4) .horizontal-table th:not(:first-child):not(:nth-child(2)), .report-section:nth-child(4) .horizontal-table td:not(:first-child):not(:nth-child(2)) { width: calc((100% - 8% - 12%) / 7); }
+            .hsd-outstanding-table .hsd-col-sno { width: 5%; }
+            .hsd-outstanding-table .hsd-col-date { width: 10%; }
+            .hsd-outstanding-table .hsd-col-equal { width: calc((100% - 5% - 10%) / 7); }
             .grand-total { font-size: 0.9rem; margin: 0.3rem 0 0; }
             .data-row { margin: 0.3rem 0; font-size: 0.75rem; }
             .data-row.highlight { margin: 0.3rem 0; padding: 0.3rem 0; }
@@ -287,7 +287,18 @@
                     HSD OUTSTANDING
                 </div>
                 <% if (hsdOutstanding && hsdOutstanding.length > 0) { %>
-                <table class="horizontal-table" style="text-align: right;">
+                <table class="horizontal-table hsd-outstanding-table" style="text-align: right;">
+                    <colgroup>
+                        <col class="hsd-col-sno">
+                        <col class="hsd-col-date">
+                        <col class="hsd-col-equal">
+                        <col class="hsd-col-equal">
+                        <col class="hsd-col-equal">
+                        <col class="hsd-col-equal">
+                        <col class="hsd-col-equal">
+                        <col class="hsd-col-equal">
+                        <col class="hsd-col-equal">
+                    </colgroup>
                     <thead>
                         <tr>
                             <th style="text-align: center; width: 60px;">S.No</th>
