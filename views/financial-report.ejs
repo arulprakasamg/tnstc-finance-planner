@@ -57,22 +57,35 @@
         .print-position-date { display: none; text-align: center; margin: 1.5rem 0 2rem 0; font-size: 0.95rem; color: #1a3c5e; font-weight: 600; }
 
         @media print {
+            html, body { height: 100%; overflow: hidden; }
             .sidebar { display: none !important; }
             .print-button-container { display: none !important; }
             header { display: none !important; }
             .main-content { margin-left: 0 !important; width: 100%; }
             body { background: white; margin: 0; padding: 0; }
-            .container { max-width: 100%; margin: 0; padding: 1rem; }
-            .report-header { margin: 0 0 1.5rem 0; }
+            .container { max-width: 100%; margin: 0; padding: 0.5rem; transform: scale(0.82); transform-origin: top center; }
+            .report-header { margin: 0; padding: 0; }
+            .report-header h2 { font-size: 1.1rem; margin: 0; }
             .date-selector-container { display: none !important; }
-            .print-position-date { display: block !important; }
-            .report-section { page-break-inside: avoid; margin-top: 1.5rem; }
-            .split-section { page-break-inside: avoid; }
-            .horizontal-table { page-break-inside: avoid; box-shadow: none !important; }
+            .print-position-date { display: block !important; margin: 0.3rem 0 0.5rem 0; font-size: 0.75rem; }
+            .report-section { page-break-before: avoid; page-break-after: avoid; page-break-inside: avoid; break-inside: avoid; margin: 0.4rem 0; padding: 0; }
+            .section-title { font-size: 0.85rem; margin: 0 0 0.4rem 0; padding-bottom: 0.2rem; }
+            .section-title span { font-size: 0.7rem; }
+            .split-section { page-break-before: avoid; page-break-after: avoid; page-break-inside: avoid; break-inside: avoid; margin: 0.4rem 0; }
+            .split-col { padding: 0.6rem; }
+            .split-header { margin: -0.6rem -0.6rem 0.4rem -0.6rem; padding: 0.3rem; font-size: 0.8rem; }
+            .horizontal-table { page-break-before: avoid; page-break-after: avoid; page-break-inside: avoid; break-inside: avoid; box-shadow: none !important; margin: 0 0 0.3rem 0; }
+            .horizontal-table th, .horizontal-table td { padding: 6px 6px; font-size: 0.7rem; }
+            .grand-total { font-size: 0.9rem; margin: 0.3rem 0 0; }
+            .data-row { margin: 0.3rem 0; font-size: 0.75rem; }
+            .data-row.highlight { margin: 0.3rem 0; padding: 0.3rem 0; }
+            .data-row.highlight .value { font-size: 0.85rem; }
+            .data-row.balance-row { margin: 0.3rem 0; padding: 0.3rem 0; }
+            .data-row.balance-row .value { font-size: 0.85rem; }
             table { border-collapse: collapse; width: 100%; }
             thead { display: table-header-group; }
             tfoot { display: table-footer-group; }
-            tr { page-break-inside: avoid; }
+            tr { page-break-before: avoid; page-break-after: avoid; page-break-inside: avoid; break-inside: avoid; }
             * { box-shadow: none !important; }
         }
     </style>
