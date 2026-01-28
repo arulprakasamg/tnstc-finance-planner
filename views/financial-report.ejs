@@ -236,7 +236,7 @@
                 <div class="section-title">
                     HSD OUTSTANDING
                 </div>
-                <% if (hsdOutstandingHistory.length > 0) { %>
+                <% if (hsdOutstanding && hsdOutstanding.length > 0) { %>
                 <table class="horizontal-table" style="text-align: right;">
                     <thead>
                         <tr>
@@ -252,30 +252,47 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <% hsdOutstandingHistory.forEach((r, index) => { %>
+                        <% 
+                           let grandTotalIOC = 0;
+                           let grandTotalBPC = 0;
+                           let grandTotalHPC = 0;
+                           let grandTotalRetail = 0;
+                           let grandTotalRamnad = 0;
+                           let grandTotalCNG = 0;
+                           let grandTotalAll = 0;
+                        %>
+                        <% hsdOutstanding.forEach((r, index) => { 
+                            grandTotalIOC += (Number(r.IOC) || 0);
+                            grandTotalBPC += (Number(r.BPC) || 0);
+                            grandTotalHPC += (Number(r.HPC) || 0);
+                            grandTotalRetail += (Number(r['Retail / Confed']) || 0);
+                            grandTotalRamnad += (Number(r.Ramnad) || 0);
+                            grandTotalCNG += (Number(r.CNG) || 0);
+                            grandTotalAll += (Number(r.total) || 0);
+                        %>
                             <tr>
                                 <td style="text-align: center; background: none; font-weight: 400;"><%= index + 1 %></td>
-                                <td style="text-align: center; background: none; font-weight: 400;"><%= r.formattedDate %></td>
-                                <td><%= (r.IOC / 100000).toFixed(2) %></td>
-                                <td><%= (r.BPC / 100000).toFixed(2) %></td>
-                                <td><%= (r.HPC / 100000).toFixed(2) %></td>
-                                <td><%= (r.Retail / 100000).toFixed(2) %></td>
-                                <td><%= (r.Ramnad / 100000).toFixed(2) %></td>
-                                <td><%= (r.CNG / 100000).toFixed(2) %></td>
-                                <td style="font-weight: 800;"><%= (r.total / 100000).toFixed(2) %></td>
+                                <td style="text-align: center; background: none; font-weight: 400;"><%= r.date %></td>
+                                <td><%= ((Number(r.IOC) || 0) / 100000).toFixed(2) %></td>
+                                <td><%= ((Number(r.BPC) || 0) / 100000).toFixed(2) %></td>
+                                <td><%= ((Number(r.HPC) || 0) / 100000).toFixed(2) %></td>
+                                <td><%= ((Number(r['Retail / Confed']) || 0) / 100000).toFixed(2) %></td>
+                                <td><%= ((Number(r.Ramnad) || 0) / 100000).toFixed(2) %></td>
+                                <td><%= ((Number(r.CNG) || 0) / 100000).toFixed(2) %></td>
+                                <td style="font-weight: 800;"><%= ((Number(r.total) || 0) / 100000).toFixed(2) %></td>
                             </tr>
                         <% }) %>
                     </tbody>
                     <tfoot style="background: #f8fafc; font-weight: 800; border-top: 2px solid #1a3c5e;">
                         <tr>
                             <td colspan="2" style="text-align: right;">TOTAL</td>
-                            <td><%= (hsdGrandTotals.IOC / 100000).toFixed(2) %></td>
-                            <td><%= (hsdGrandTotals.BPC / 100000).toFixed(2) %></td>
-                            <td><%= (hsdGrandTotals.HPC / 100000).toFixed(2) %></td>
-                            <td><%= (hsdGrandTotals.Retail / 100000).toFixed(2) %></td>
-                            <td><%= (hsdGrandTotals.Ramnad / 100000).toFixed(2) %></td>
-                            <td><%= (hsdGrandTotals.CNG / 100000).toFixed(2) %></td>
-                            <td style="color: #1a3c5e;"><%= (hsdGrandTotals.Total / 100000).toFixed(2) %></td>
+                            <td><%= (grandTotalIOC / 100000).toFixed(2) %></td>
+                            <td><%= (grandTotalBPC / 100000).toFixed(2) %></td>
+                            <td><%= (grandTotalHPC / 100000).toFixed(2) %></td>
+                            <td><%= (grandTotalRetail / 100000).toFixed(2) %></td>
+                            <td><%= (grandTotalRamnad / 100000).toFixed(2) %></td>
+                            <td><%= (grandTotalCNG / 100000).toFixed(2) %></td>
+                            <td style="color: #1a3c5e;"><%= (grandTotalAll / 100000).toFixed(2) %></td>
                         </tr>
                     </tfoot>
                 </table>
