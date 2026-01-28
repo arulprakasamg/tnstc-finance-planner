@@ -33,29 +33,11 @@ router.get('/', (req, res) => {
     const toDateInput = req.query.toDate || ddmmyyyyToYmd(positionDate);
     
     // Read live data
-    const banksMaster = JSON.parse(fs.readFileSync(MASTER_DATA_PATH, 'utf8'));
-    const dailyBalances = JSON.parse(fs.readFileSync(BALANCES_DATA_PATH, 'utf8'));
+    const { getFinancePosition } = require('../utils/financeUtils');
+    const financeData = getFinancePosition(positionDate);
     
-    // Sort dates to find the latest balance on or before positionDate
-    const availableDates = Object.keys(dailyBalances).sort((a, b) => ddmmyyyyToYmd(a).localeCompare(ddmmyyyyToYmd(b)));
-
-    // Calculate live bank balances using rolling logic
-    let totalLiveBankBalance = 0;
-    const liveBankBreakdown = BANK_ORDER.map(bankName => {
-        const bankInfo = banksMaster.find(b => b.accountName === bankName || b.bankName === bankName);
-        let balance = 0;
-        
-        if (bankInfo) {
-            // Find most recent balance on or before positionDate
-            const effectiveDate = availableDates.slice().reverse().find(d => ddmmyyyyToYmd(d) <= ddmmyyyyToYmd(positionDate) && dailyBalances[d][bankInfo.id] !== undefined);
-            if (effectiveDate) {
-                balance = Number(dailyBalances[effectiveDate][bankInfo.id]) || 0;
-            }
-        }
-        
-        totalLiveBankBalance += balance;
-        return { name: bankName, balance: balance };
-    });
+    const totalLiveBankBalance = financeData.openingBalance;
+    const liveBankBreakdown = financeData.bankBreakdown;
     
     // Calculate collection for selected positionDate
     const collectionsDataPath = path.join(__dirname, '../data/daily_collections.json');
