@@ -100,6 +100,8 @@
                             <div class="sub-category"><span>IT</span><input type="number" data-cat="Region Fund" data-sub="IT" step="0.01" min="0"></div>
                             <div class="sub-category"><span>Texco</span><input type="number" data-cat="Region Fund" data-sub="Texco" step="0.01" min="0"></div>
                             <div class="sub-category"><span>Telephone</span><input type="number" data-cat="Region Fund" data-sub="Telephone" step="0.01" min="0"></div>
+                            <div class="sub-category"><span>LIC / PLI</span><input type="number" data-cat="Region Fund" data-sub="LIC / PLI" step="0.01" min="0"></div>
+                            <div class="sub-category"><span>Union / Court Recovery</span><input type="number" data-cat="Region Fund" data-sub="Union / Court Recovery" step="0.01" min="0"></div>
                         </div>
 
                         <div class="category-block" data-category="Employee Related Payment 1 (Own Fund)">
@@ -111,7 +113,7 @@
                             <div class="sub-category"><span>Act Apprentice Salary</span><input type="number" data-cat="Employee Related Payment 1 (Own Fund)" data-sub="Act Apprentice Salary" step="0.01" min="0"></div>
                             <div class="sub-category"><span>Incentive / TA-Bill</span><input type="number" data-cat="Employee Related Payment 1 (Own Fund)" data-sub="Incentive / TA-Bill" step="0.01" min="0"></div>
                             <div class="sub-category"><span>RBS</span><input type="number" data-cat="Employee Related Payment 1 (Own Fund)" data-sub="RBS" step="0.01" min="0"></div>
-                            <div class="sub-category"><span>Union / Court Recovery</span><input type="number" data-cat="Employee Related Payment 1 (Own Fund)" data-sub="Union / Court Recovery" step="0.01" min="0"></div>
+                            <div class="sub-category"><span>EHHF</span><input type="number" data-cat="Employee Related Payment 1 (Own Fund)" data-sub="EHHF" step="0.01" min="0"></div>
                             <div class="sub-category"><span>Marriage Advance</span><input type="number" data-cat="Employee Related Payment 1 (Own Fund)" data-sub="Marriage Advance" step="0.01" min="0"></div>
                             <div class="sub-category"><span>Interest (EL, PF, CPS, Gratuity)</span><input type="number" data-cat="Employee Related Payment 1 (Own Fund)" data-sub="Interest (EL, PF, CPS, Gratuity)" step="0.01" min="0"></div>
                             <div class="sub-category"><span>Advance (PF, CPS)</span><input type="number" data-cat="Employee Related Payment 1 (Own Fund)" data-sub="Advance (PF, CPS)" step="0.01" min="0"></div>
@@ -320,7 +322,8 @@
                 return;
             }
 
-            // Hard Validation: Total Planned Amount > Available Fund
+            // Hard Validation: Removed as per new requirement to allow overpayment
+            /*
             let totalPlanned = 0;
             payments.forEach(p => totalPlanned += p.amount);
             
@@ -328,6 +331,7 @@
                 alert('Planned amount exceeds available net collection.');
                 return;
             }
+            */
 
             try {
                 const res = await fetch('/payment-planning/save', {
