@@ -42,7 +42,7 @@ router.get('/', (req, res) => {
     // Calculate live bank balances using rolling logic
     let totalLiveBankBalance = 0;
     const liveBankBreakdown = BANK_ORDER.map(bankName => {
-        const bankInfo = banksMaster.find(b => b.bankName === bankName || b.accountName === bankName);
+        const bankInfo = banksMaster.find(b => b.accountName === bankName || b.bankName === bankName);
         let balance = 0;
         
         if (bankInfo) {

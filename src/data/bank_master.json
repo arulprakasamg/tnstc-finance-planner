@@ -1,23 +1,37 @@
 [
   {
     "id": "1",
-    "accountName": "OPERATIONAL FUND - SBI",
-    "accountNumber": "1234567890",
-    "bankName": "SBI – PLATINUM",
+    "accountName": "SBI - Platinum",
+    "accountNumber": "38786918093",
+    "bankName": "State Bank of India",
     "accountType": "Operational"
   },
   {
     "id": "2",
-    "accountName": "COLLECTION ACCOUNT - IOB",
-    "accountNumber": "5555123456",
-    "bankName": "IOB – 5555",
+    "accountName": "IOB - 5555",
+    "accountNumber": "004402000005555",
+    "bankName": "Indian Overseas Bank",
     "accountType": "Operational"
   },
   {
     "id": "3",
-    "accountName": "SAVINGS ACCOUNT - IB",
+    "accountName": "IB",
     "accountNumber": "9876543210",
-    "bankName": "I.B",
+    "bankName": "Indian Bank",
     "accountType": "Savings"
+  },
+  {
+    "id": "1769597143891",
+    "accountName": "IOB - 42300 ( INS )",
+    "accountNumber": "004401000042300",
+    "bankName": "Indian Overseas Bank",
+    "accountType": "Operational"
+  },
+  {
+    "id": "1769597162744",
+    "accountName": "IOB - 142300 ( ACS )",
+    "accountNumber": "004401000142300",
+    "bankName": "Indian Overseas Bank",
+    "accountType": "Operational"
   }
 ]
