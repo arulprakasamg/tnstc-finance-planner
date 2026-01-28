@@ -62,7 +62,7 @@ function getFinancePosition(positionDate) {
             }
         }
 
-        // 3. Planned Payments & 4. HSD Payments
+        // 3. Planned Payments & 4. HSD Payments (Already in Lakhs)
         if (fs.existsSync(PAYMENTS_PATH)) {
             const planning = JSON.parse(fs.readFileSync(PAYMENTS_PATH, 'utf8'));
             if (planning[positionDate]) {
@@ -83,8 +83,10 @@ function getFinancePosition(positionDate) {
             }
         }
 
-        // 5. Closing Balance
-        result.closingBalance = result.openingBalance + result.netCollection - result.payments.total;
+        // 5. Closing Balance (Note: Opening Balance is in Crores, need to convert to Lakhs for consistency)
+        // Rule: Opening (Crores) * 100 = Opening (Lakhs)
+        const openingInLakhs = result.openingBalance * 100;
+        result.closingBalance = openingInLakhs + result.netCollection - result.payments.total;
 
         // HSD Outstanding (Cumulative Purchase logic)
         if (fs.existsSync(HSD_DATA_PATH)) {

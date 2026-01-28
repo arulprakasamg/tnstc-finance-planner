@@ -1,0 +1,108 @@
+Project Context:
+I am working on a Node.js + Express + EJS project named TNSTC Finance Planner.
+The UI, layout, CSS, and EJS structure are finalized.
+Do NOT change design, HTML structure, or styling.
+
+🚨 Core Business Rule (VERY IMPORTANT)
+
+For the following modules, ALL monetary values are entered and stored in LAKHS, not rupees:
+
+HSD Management (Outstanding only)
+
+Daily Collections
+
+Payment Planning
+
+Expenses shown in Financial Report
+
+Example:
+
+₹1,00,00,000 (1 Crore) is entered as 100
+
+₹25,00,000 is entered as 25
+
+These values are ALREADY in Lakhs when saved in JSON files.
+
+❌ Current Problem
+
+In the Financial Report, backend logic is incorrectly converting values again, assuming they are rupees:
+
+Extra divisions like /100, /100000, etc.
+
+Double conversion from Lakhs → Rupees → Lakhs
+
+This causes:
+
+HSD Outstanding totals to be wrong
+
+Collection / Expense / Payment totals to mismatch
+
+Financial Report showing empty or incorrect data
+
+✅ Correct Logic (What MUST be implemented)
+GLOBAL RULE (Except Bank Balance):
+
+Treat all numeric values as Lakhs
+
+DO NOT convert Lakhs to Rupees
+
+DO NOT divide or multiply by any factor
+
+Directly sum, subtract, and display values
+
+Specifically Fix:
+1️⃣ HSD Outstanding (Financial Report)
+
+Use values from HSD Management as-is
+
+Support multiple purchase dates
+
+Display per-date outstanding and grand total
+
+2️⃣ Daily Collections (Financial Report)
+
+grossCollection, batta, posCharges, netCollection
+
+Treat all as Lakhs
+
+No conversion logic
+
+3️⃣ Payment Planning / Expenses
+
+Planned payments are already in Lakhs
+
+Expense totals must be calculated directly
+
+4️⃣ Financial Report Totals
+
+Net Collection – Expenses = Balance (all in Lakhs)
+
+🚫 Explicitly Out of Scope (DO NOT TOUCH)
+
+❌ Bank Balance logic (we will modify later)
+
+❌ UI / HTML / CSS
+
+❌ JSON file structure
+
+❌ Field names
+
+❌ Route names
+
+🛡 Safety Requirements
+
+If a value is missing, default to 0
+
+No runtime crashes
+
+Date handling must remain dd/mm/yyyy
+
+🎯 Expected Outcome
+
+What I enter as 100 must display as 100.00 everywhere
+
+Financial Report values must exactly match input intent
+
+HSD Outstanding, Collections, Expenses all reconcile correctly
+
+Please apply minimal backend-only changes, refactor carefully, and explain briefly what was fixed.
