@@ -137,8 +137,13 @@ router.post('/save-all-balances', (req, res) => {
 
 // Create new bank master
 router.post('/add', (req, res) => {
-    const { accountName, accountNumber, bankName, accountType } = req.body;
+    const body = req.body || {};
+    const { accountName, accountNumber, bankName, accountType } = body;
     const banks = getMasterData();
+
+    if (!accountName || !accountNumber || !bankName) {
+        return res.status(400).send('Account Name, Number and Bank Name are required');
+    }
 
     // Unique Account Number validation
     if (banks.some(b => b.accountNumber === accountNumber)) {
@@ -150,7 +155,7 @@ router.post('/add', (req, res) => {
         accountName,
         accountNumber,
         bankName,
-        accountType
+        accountType: accountType || 'Operational'
     };
 
     banks.push(newBank);
@@ -161,17 +166,28 @@ router.post('/add', (req, res) => {
 // Update bank master
 router.post('/edit/:id', (req, res) => {
     const { id } = req.params;
-    const { accountName, accountNumber, bankName, accountType } = req.body;
+    const body = req.body || {};
+    const { accountName, accountNumber, bankName, accountType } = body;
     let banks = getMasterData();
 
     const index = banks.findIndex(b => b.id === id);
     if (index !== -1) {
+        if (!accountName || !accountNumber || !bankName) {
+            return res.status(400).send('Account Name, Number and Bank Name are required');
+        }
+
         // Unique Account Number check (excluding current record)
         if (banks.some(b => b.accountNumber === accountNumber && b.id !== id)) {
             return res.status(400).send('Account Number must be unique');
         }
 
-        banks[index] = { ...banks[index], accountName, accountNumber, bankName, accountType };
+        banks[index] = { 
+            ...banks[index], 
+            accountName: accountName || banks[index].accountName,
+            accountNumber: accountNumber || banks[index].accountNumber,
+            bankName: bankName || banks[index].bankName,
+            accountType: accountType || banks[index].accountType
+        };
         saveMasterData(banks);
     }
     res.redirect('/bank-balances');
