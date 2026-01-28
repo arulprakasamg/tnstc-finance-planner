@@ -54,15 +54,21 @@
         .print-button { background: #1a3c5e; color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 6px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: background 0.3s ease; }
         .print-button:hover { background: #0f2540; }
 
+        .print-position-date { display: none; text-align: center; margin: 1.5rem 0 2rem 0; font-size: 0.95rem; color: #1a3c5e; font-weight: 600; }
+
         @media print {
             .sidebar { display: none !important; }
             .print-button-container { display: none !important; }
+            header { display: none !important; }
             .main-content { margin-left: 0 !important; width: 100%; }
-            body { background: white; }
-            .container { max-width: 100%; margin: 0; padding: 0.5rem; }
-            .report-section { page-break-inside: avoid; margin-top: 2rem; }
+            body { background: white; margin: 0; padding: 0; }
+            .container { max-width: 100%; margin: 0; padding: 1rem; }
+            .report-header { margin: 0 0 1.5rem 0; }
+            .date-selector-container { display: none !important; }
+            .print-position-date { display: block !important; }
+            .report-section { page-break-inside: avoid; margin-top: 1.5rem; }
             .split-section { page-break-inside: avoid; }
-            .horizontal-table { page-break-inside: avoid; }
+            .horizontal-table { page-break-inside: avoid; box-shadow: none !important; }
             table { border-collapse: collapse; width: 100%; }
             thead { display: table-header-group; }
             tfoot { display: table-footer-group; }
@@ -94,6 +100,9 @@
             </div>
             <div class="report-header">
                 <h2>TNSTC KUMBAKONAM – FINANCE POSITION</h2>
+            </div>
+            <div class="print-position-date">
+                Position Date : <%= positionDate %>
             </div>
             <div class="date-selector-container">
                 <label for="positionDateInput">Position Date</label>
