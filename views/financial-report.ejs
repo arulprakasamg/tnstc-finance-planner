@@ -272,11 +272,11 @@
                         %>
                             <tr>
                                 <td style="text-align: center; background: none; font-weight: 400;"><%= index + 1 %></td>
-                                <td style="text-align: center; background: none; font-weight: 400;"><%= r.date %></td>
+                                <td style="text-align: center; background: none; font-weight: 400;"><%= r.formattedDate %></td>
                                 <td><%= ((Number(r.IOC) || 0) / 100000).toFixed(2) %></td>
                                 <td><%= ((Number(r.BPC) || 0) / 100000).toFixed(2) %></td>
                                 <td><%= ((Number(r.HPC) || 0) / 100000).toFixed(2) %></td>
-                                <td><%= ((Number(r['Retail / Confed']) || 0) / 100000).toFixed(2) %></td>
+                                <td><%= ((Number(r.Retail) || 0) / 100000).toFixed(2) %></td>
                                 <td><%= ((Number(r.Ramnad) || 0) / 100000).toFixed(2) %></td>
                                 <td><%= ((Number(r.CNG) || 0) / 100000).toFixed(2) %></td>
                                 <td style="font-weight: 800;"><%= ((Number(r.total) || 0) / 100000).toFixed(2) %></td>

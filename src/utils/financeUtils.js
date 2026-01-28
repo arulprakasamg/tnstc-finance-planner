@@ -86,22 +86,42 @@ function getFinancePosition(positionDate) {
         // 5. Closing Balance
         result.closingBalance = result.openingBalance + result.netCollection - result.payments.total;
 
-        // HSD Outstanding (Helper for ledger)
+        // HSD Outstanding (Cumulative Purchase logic)
         if (fs.existsSync(HSD_DATA_PATH)) {
             const hsdRaw = JSON.parse(fs.readFileSync(HSD_DATA_PATH, 'utf8'));
-            Object.keys(hsdRaw).forEach(dateStr => {
-                if (ddmmyyyyToYmd(toDDMMYYYY(dateStr)) <= ddmmyyyyToYmd(positionDate)) {
+            const sortedDates = Object.keys(hsdRaw).sort((a, b) => ddmmyyyyToYmd(toDDMMYYYY(a)).localeCompare(ddmmyyyyToYmd(toDDMMYYYY(b))));
+            
+            let cumulative = { IOC: 0, BPC: 0, HPC: 0, Retail: 0, Ramnad: 0, CNG: 0 };
+            
+            result.hsdOutstandingHistory = [];
+
+            sortedDates.forEach(dateStr => {
+                const dateDmy = toDDMMYYYY(dateStr);
+                if (ddmmyyyyToYmd(dateDmy) <= ddmmyyyyToYmd(positionDate)) {
                     const entry = hsdRaw[dateStr];
-                    result.hsdOutstanding.IOC += Number(entry.IOC) || 0;
-                    result.hsdOutstanding.BPC += Number(entry.BPC) || 0;
-                    result.hsdOutstanding.HPC += Number(entry.HPC) || 0;
-                    result.hsdOutstanding.Retail += Number(entry.Retail) || 0;
-                    result.hsdOutstanding.Ramnad += Number(entry.Ramnad) || 0;
-                    result.hsdOutstanding.CNG += Number(entry.CNG) || 0;
+                    cumulative.IOC += Number(entry.IOC) || 0;
+                    cumulative.BPC += Number(entry.BPC) || 0;
+                    cumulative.HPC += Number(entry.HPC) || 0;
+                    cumulative.Retail += Number(entry.Retail) || 0;
+                    cumulative.Ramnad += Number(entry.Ramnad) || 0;
+                    cumulative.CNG += Number(entry.CNG) || 0;
+
+                    const rowTotal = cumulative.IOC + cumulative.BPC + cumulative.HPC + cumulative.Retail + cumulative.Ramnad + cumulative.CNG;
+
+                    result.hsdOutstandingHistory.push({
+                        formattedDate: dateDmy,
+                        IOC: cumulative.IOC,
+                        BPC: cumulative.BPC,
+                        HPC: cumulative.HPC,
+                        Retail: cumulative.Retail,
+                        Ramnad: cumulative.Ramnad,
+                        CNG: cumulative.CNG,
+                        total: rowTotal
+                    });
                 }
             });
-            result.hsdOutstanding.Total = result.hsdOutstanding.IOC + result.hsdOutstanding.BPC + result.hsdOutstanding.HPC + 
-                                         result.hsdOutstanding.Retail + result.hsdOutstanding.Ramnad + result.hsdOutstanding.CNG;
+
+            result.hsdOutstanding = { ...cumulative, Total: cumulative.IOC + cumulative.BPC + cumulative.HPC + cumulative.Retail + cumulative.Ramnad + cumulative.CNG };
         }
 
     } catch (err) {

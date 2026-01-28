@@ -58,26 +58,15 @@ router.get('/', (req, res) => {
         });
     }
 
-    // Prepare hsdOutstandingHistory as before for the ledger
-    let hsdOutstandingHistory = [];
+    // Prepare hsdOutstandingHistory (Cumulative purchase outstanding)
+    let hsdOutstandingHistory = financePos.hsdOutstandingHistory || [];
     let hsdGrandTotals = financePos.hsdOutstanding;
-    if (fs.existsSync(HSD_DATA_PATH)) {
-        const hsdRaw = JSON.parse(fs.readFileSync(HSD_DATA_PATH, 'utf8'));
-        hsdOutstandingHistory = Object.keys(hsdRaw)
-            .filter(d => ddmmyyyyToYmd(toDDMMYYYY(d)) <= ddmmyyyyToYmd(positionDate))
-            .sort((a, b) => ddmmyyyyToYmd(toDDMMYYYY(a)).localeCompare(ddmmyyyyToYmd(toDDMMYYYY(b))))
-            .map(dateStr => {
-                const r = hsdRaw[dateStr];
-                const rowTotal = (Number(r.IOC) || 0) + (Number(r.BPC) || 0) + (Number(r.HPC) || 0) + (Number(r.Retail) || 0) + (Number(r.Ramnad) || 0) + (Number(r.CNG) || 0);
-                return { ...r, formattedDate: toDDMMYYYY(dateStr), total: rowTotal };
-            });
-    }
 
     res.render('financial-report', { 
         today, positionDate, bankData, totalBankBalance,
         collectionInfo, expenseInfo, otherPaymentsList,
         hsdPaymentsList, hsdTotal, hsdOutstandingHistory, hsdGrandTotals,
-        hsdOutstandingPayments, hsdOutstanding: hsdOutstandingPayments
+        hsdOutstandingPayments, hsdOutstanding: hsdOutstandingHistory
     });
 });
 
